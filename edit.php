@@ -178,9 +178,10 @@ include __DIR__ . '/partials/head.php';
       </div>
 
       <div>
-        <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Music Link (YouTube/Spotify, optional)</label>
-        <input type="url" name="music_link" value="<?php echo e($entry['music_link']); ?>" placeholder="https://youtube.com/... or https://open.spotify.com/..."
-               class="w-full rounded-2xl px-4 py-3 bg-white/70 dark:bg-gray-700/50 focus:bg-white dark:focus:bg-gray-700 text-gray-900 dark:text-gray-100 outline-none border border-primary-100 dark:border-gray-600 focus:border-primary-400 dark:focus:border-primary-500 shadow-sm transition" />
+        <label for="music_link" class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Music Link (YouTube/Spotify, optional)</label>
+        <input type="text" id="music_link" name="music_link" value="<?php echo e($entry['music_link'] ?? ''); ?>" placeholder="https://youtube.com/... or https://open.spotify.com/..." autocomplete="off"
+               class="w-full rounded-2xl px-4 py-3 bg-white/70 dark:bg-gray-700/50 focus:bg-white dark:focus:bg-gray-700 text-gray-900 dark:text-gray-100 outline-none border border-primary-100 dark:border-gray-600 focus:border-primary-400 dark:focus:border-primary-500 shadow-sm transition" style="pointer-events: auto !important;" />
+        <small class="text-xs text-gray-500 dark:text-gray-400 mt-1">Enter YouTube or Spotify URL</small>
       </div>
 
       <div>
