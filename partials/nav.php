@@ -27,7 +27,12 @@ $base = rtrim(app_base_url(), '/');
       </a>
       <div class="flex items-center gap-2 md:gap-4 flex-wrap justify-end">
         <?php if ($authed): ?>
-          <a href="<?php echo e($base); ?>/dashboard.php" class="px-4 py-2 rounded-full bg-white/70 hover:bg-white/90 text-gray-700 transition shadow-sm hover:shadow-md text-sm md:text-base">Dashboard</a>  
+          <a href="<?php echo e($base); ?>/dashboard.php" class="px-4 py-2 rounded-full bg-white/70 hover:bg-white/90 text-gray-700 dark:text-gray-200 dark:bg-gray-800/70 dark:hover:bg-gray-800 transition shadow-sm hover:shadow-md text-sm md:text-base">Dashboard</a>
+          <a href="<?php echo e($base); ?>/categories.php" class="px-4 py-2 rounded-full bg-white/70 hover:bg-white/90 text-gray-700 dark:text-gray-200 dark:bg-gray-800/70 dark:hover:bg-gray-800 transition shadow-sm hover:shadow-md text-sm md:text-base">Categories</a>
+          <a href="<?php echo e($base); ?>/analytics.php" class="px-4 py-2 rounded-full bg-white/70 hover:bg-white/90 text-gray-700 dark:text-gray-200 dark:bg-gray-800/70 dark:hover:bg-gray-800 transition shadow-sm hover:shadow-md text-sm md:text-base">Analytics</a>
+          <?php if (is_admin()): ?>
+          <a href="<?php echo e($base); ?>/admin.php" class="px-4 py-2 rounded-full bg-red-500/20 hover:bg-red-500/30 text-red-700 dark:text-red-300 transition shadow-sm hover:shadow-md text-sm md:text-base">Admin</a>
+          <?php endif; ?>
           <!-- Profile Dropdown -->
           <div class="relative">
             <button id="profileDropdown" class="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center text-white font-bold shadow-md hover:shadow-lg transition text-lg" aria-label="Profile menu">
@@ -39,7 +44,10 @@ $base = rtrim(app_base_url(), '/');
                 <p class="text-sm font-medium text-gray-800 dark:text-white"><?php echo e(current_username()); ?></p>
               </div>
               <a href="<?php echo e($base); ?>/profile.php" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition">
-              Profile
+                Profile
+              </a>
+              <a href="<?php echo e($base); ?>/create.php" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition">
+                ➕ New Entry
               </a>
               <a href="<?php echo e($base); ?>/logout.php" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-red-900/20 transition">
                 Logout

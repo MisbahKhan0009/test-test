@@ -16,6 +16,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $entryDate = trim($_POST['entry_date'] ?? '');
   $musicLink = trim($_POST['music_link'] ?? '');
   $imageUrl = trim($_POST['image_url'] ?? '');
+  $categoryId = !empty($_POST['category_id']) ? (int)$_POST['category_id'] : null;
+  $tagsInput = trim($_POST['tags'] ?? '');
+  $location = trim($_POST['location'] ?? '');
+  $privacyLevel = $_POST['privacy_level'] ?? 'private';
 
   // Validate mood
   $allowed = array_keys(allowed_moods());
@@ -44,12 +48,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     error_log("[Create Entry] Image URL: " . $imageUrl);
     
     try {
-      $entryId = db_tx(function(PDO $pdo) use ($config, $title, $content, $mood, $timestamp, $musicLink, $imageUrl) {
+      $entryId = db_tx(function(PDO $pdo) use ($config, $title, $content, $mood, $timestamp, $musicLink, $imageUrl, $categoryId, $tagsInput, $location, $privacyLevel) {
 
         // INSERT ENTRY
         $stmt = $pdo->prepare('
-          INSERT INTO entries (user_id, title, content, mood, timestamp, music_link)
-          VALUES (?, ?, ?, ?, ?, ?)
+          INSERT INTO entries (user_id, title, content, mood, timestamp, music_link, category_id, location, privacy_level)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         ');
         $stmt->execute([
           current_user_id(),
@@ -57,10 +61,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           $content,
           $mood !== '' ? $mood : null,
           $timestamp,
-          $musicLink !== '' ? $musicLink : null
+          $musicLink !== '' ? $musicLink : null,
+          $categoryId,
+          $location !== '' ? $location : null,
+          $privacyLevel
         ]);
 
         $entryId = (int)$pdo->lastInsertId();
+        
+        // HANDLE TAGS
+        if ($tagsInput !== '') {
+          $tags = array_map('trim', explode(',', $tagsInput));
+          foreach ($tags as $tagName) {
+            if ($tagName !== '') {
+              $tagId = get_or_create_tag($tagName);
+              add_tag_to_entry($entryId, $tagId);
+            }
+          }
+        }
 
         // HANDLE FILE UPLOADS
         if (!empty($_FILES['media']['name'][0])) {
@@ -170,6 +188,27 @@ include __DIR__ . '/partials/head.php';
           </select>
         </div>
       </div>
+      
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Category</label>
+          <select name="category_id" class="w-full rounded-2xl px-4 py-3 bg-white/70 dark:bg-gray-700/50 focus:bg-white dark:focus:bg-gray-700 text-gray-900 dark:text-gray-100 outline-none border border-primary-100 dark:border-gray-600 shadow-sm transition">
+            <option value="">No category</option>
+            <?php $categories = get_categories(); foreach ($categories as $cat): ?>
+              <option value="<?php echo $cat['category_id']; ?>"><?php echo e($cat['icon'] . ' ' . $cat['category_name']); ?></option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+        
+        <div>
+          <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Privacy Level</label>
+          <select name="privacy_level" class="w-full rounded-2xl px-4 py-3 bg-white/70 dark:bg-gray-700/50 focus:bg-white dark:focus:bg-gray-700 text-gray-900 dark:text-gray-100 outline-none border border-primary-100 dark:border-gray-600 shadow-sm transition">
+            <?php foreach (get_privacy_levels() as $value => $label): ?>
+              <option value="<?php echo e($value); ?>" <?php echo $value === 'private' ? 'selected' : ''; ?>><?php echo e($label); ?></option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+      </div>
 
       <div>
         <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Title</label>
@@ -179,6 +218,18 @@ include __DIR__ . '/partials/head.php';
       <div>
         <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Content</label>
         <textarea name="content" required rows="8" class="w-full rounded-2xl px-4 py-3 bg-white/70 dark:bg-gray-700/50 focus:bg-white dark:focus:bg-gray-700 outline-none border border-primary-100 dark:border-gray-600 shadow-sm transition"></textarea>
+      </div>
+      
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Tags (comma-separated)</label>
+          <input name="tags" placeholder="summer, travel, adventure" class="w-full rounded-2xl px-4 py-3 bg-white/70 dark:bg-gray-700/50 focus:bg-white dark:focus:bg-gray-700 outline-none border border-primary-100 dark:border-gray-600 shadow-sm transition" />
+        </div>
+        
+        <div>
+          <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Location (optional)</label>
+          <input name="location" placeholder="e.g., New York, USA" class="w-full rounded-2xl px-4 py-3 bg-white/70 dark:bg-gray-700/50 focus:bg-white dark:focus:bg-gray-700 outline-none border border-primary-100 dark:border-gray-600 shadow-sm transition" />
+        </div>
       </div>
 
       <div>

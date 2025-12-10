@@ -10,6 +10,8 @@ $userId = current_user_id();
 $searchQuery = isset($_GET['search']) ? trim($_GET['search']) : '';
 $moodFilter = isset($_GET['mood']) ? trim($_GET['mood']) : '';
 $dateFilter = isset($_GET['date']) ? trim($_GET['date']) : '';
+$categoryFilter = isset($_GET['category']) ? (int)$_GET['category'] : 0;
+$tagFilter = isset($_GET['tag']) ? trim($_GET['tag']) : '';
 $sortBy = isset($_GET['sort']) ? trim($_GET['sort']) : 'newest';
 
 // Build SQL query with dynamic conditions
@@ -40,6 +42,18 @@ if ($dateFilter !== '') {
   }
 }
 
+// Filter by category
+if ($categoryFilter > 0) {
+  $conditions[] = 'e.category_id = ?';
+  $params[] = $categoryFilter;
+}
+
+// Filter by tag
+if ($tagFilter !== '') {
+  $conditions[] = 'EXISTS (SELECT 1 FROM entry_tags et JOIN tags t ON et.tag_id = t.tag_id WHERE et.entry_id = e.entry_id AND t.tag_name = ?)';
+  $params[] = $tagFilter;
+}
+
 // Sort options
 switch ($sortBy) {
   case 'oldest':
@@ -62,10 +76,14 @@ if (!empty($conditions)) {
 }
 
 // Execute query
-$sql = "SELECT e.*, (
-  SELECT m.file_path FROM media m WHERE m.entry_id = e.entry_id AND m.file_type LIKE 'image/%' ORDER BY m.media_id ASC LIMIT 1
-) AS cover_image
+$sql = "SELECT e.*, 
+  (SELECT m.file_path FROM media m WHERE m.entry_id = e.entry_id AND m.file_type LIKE 'image/%' ORDER BY m.media_id ASC LIMIT 1) AS cover_image,
+  c.category_name,
+  c.color AS category_color,
+  c.icon AS category_icon,
+  (SELECT GROUP_CONCAT(t.tag_name ORDER BY t.tag_name SEPARATOR ', ') FROM entry_tags et JOIN tags t ON et.tag_id = t.tag_id WHERE et.entry_id = e.entry_id) AS tags
 FROM entries e
+LEFT JOIN categories c ON e.category_id = c.category_id
 $whereClause
 $orderBy";
 
@@ -82,7 +100,7 @@ include __DIR__ . '/partials/head.php';
   
   <!-- Search and Filter Form -->
   <form method="get" class="glass rounded-3xl p-5 shadow-lg">
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       
       <!-- Search Box -->
       <div>
@@ -104,11 +122,32 @@ include __DIR__ . '/partials/head.php';
           <?php endforeach; ?>
         </select>
       </div>
+      
+      <!-- Category Filter -->
+      <div>
+        <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Category</label>
+        <select name="category" class="w-full rounded-2xl px-4 py-2 bg-white/70 dark:bg-gray-700/50 text-gray-900 dark:text-gray-100 border border-primary-100 dark:border-gray-600 focus:border-primary-400 dark:focus:border-primary-500 outline-none shadow-sm transition">
+          <option value="0">All Categories</option>
+          <?php $all_categories = get_categories(); foreach ($all_categories as $cat): ?>
+            <option value="<?php echo $cat['category_id']; ?>" <?php echo $categoryFilter == $cat['category_id'] ? 'selected' : ''; ?>>
+              <?php echo e($cat['icon'] . ' ' . $cat['category_name']); ?>
+            </option>
+          <?php endforeach; ?>
+        </select>
+      </div>
 
       <!-- Date Filter -->
       <div>
         <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Date</label>
         <input type="date" name="date" value="<?php echo e($dateFilter); ?>" 
+               class="w-full rounded-2xl px-4 py-2 bg-white/70 dark:bg-gray-700/50 text-gray-900 dark:text-gray-100 border border-primary-100 dark:border-gray-600 focus:border-primary-400 dark:focus:border-primary-500 outline-none shadow-sm transition" />
+      </div>
+      
+      <!-- Tag Filter -->
+      <div>
+        <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Tag</label>
+        <input type="text" name="tag" value="<?php echo e($tagFilter); ?>" 
+               placeholder="Filter by tag..." 
                class="w-full rounded-2xl px-4 py-2 bg-white/70 dark:bg-gray-700/50 text-gray-900 dark:text-gray-100 border border-primary-100 dark:border-gray-600 focus:border-primary-400 dark:focus:border-primary-500 outline-none shadow-sm transition" />
       </div>
 
@@ -174,7 +213,31 @@ include __DIR__ . '/partials/head.php';
             <div class="flex items-center justify-between">
               <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 truncate"><?php echo e($e['title']); ?></h2>
             </div>
+            
+            <?php if (!empty($e['category_name'])): ?>
+              <div class="mt-2">
+                <span class="inline-flex items-center px-2 py-1 rounded-lg text-xs font-medium" 
+                      style="background-color: <?php echo e($e['category_color']); ?>20; color: <?php echo e($e['category_color']); ?>; border: 1px solid <?php echo e($e['category_color']); ?>40;">
+                  <?php echo e($e['category_icon']); ?> <?php echo e($e['category_name']); ?>
+                </span>
+              </div>
+            <?php endif; ?>
+            
             <p class="text-sm text-gray-600 dark:text-gray-400 mt-2 line-clamp-2"><?php echo e(mb_strimwidth($e['content'], 0, 120, '…')); ?></p>
+            
+            <?php if (!empty($e['tags'])): ?>
+              <div class="mt-2 flex flex-wrap gap-1">
+                <?php $tag_list = explode(', ', $e['tags']); foreach (array_slice($tag_list, 0, 3) as $tag): ?>
+                  <span class="inline-block px-2 py-0.5 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs">
+                    #<?php echo e($tag); ?>
+                  </span>
+                <?php endforeach; ?>
+                <?php if (count($tag_list) > 3): ?>
+                  <span class="text-xs text-gray-500 dark:text-gray-400">+<?php echo count($tag_list) - 3; ?></span>
+                <?php endif; ?>
+              </div>
+            <?php endif; ?>
+            
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-3"><?php echo e(human_datetime($e['timestamp'])); ?></p>
           </div>
         </div>
