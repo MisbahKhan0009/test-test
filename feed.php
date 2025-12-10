@@ -97,8 +97,9 @@ include __DIR__ . '/partials/head.php';
     <form method="GET" class="space-y-4">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
         <!-- Search -->
-        <div class="md:col-span-2">
-          <input type="text" name="search" value="<?php echo e($searchQuery); ?>" placeholder="🔍 Search stories..." class="w-full rounded-full px-4 py-2 bg-white/70 dark:bg-gray-700/50 focus:bg-white dark:focus:bg-gray-700 text-gray-900 dark:text-gray-100 outline-none border border-primary-100 dark:border-gray-600 shadow-sm transition">
+        <div class="md:col-span-2 relative">
+          <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+          <input type="text" name="search" value="<?php echo e($searchQuery); ?>" placeholder="Search stories..." class="w-full rounded-full pl-10 pr-4 py-2 bg-white/70 dark:bg-gray-700/50 focus:bg-white dark:focus:bg-gray-700 text-gray-900 dark:text-gray-100 outline-none border border-primary-100 dark:border-gray-600 shadow-sm transition">
         </div>
 
         <!-- Mood Filter -->
@@ -137,7 +138,7 @@ include __DIR__ . '/partials/head.php';
   <!-- Entries Feed -->
   <?php if (count($entries) === 0): ?>
     <div class="glass rounded-2xl shadow-xl p-12 text-center">
-      <div class="text-6xl mb-4">🌍</div>
+      <div class="text-6xl mb-4"><i class="fas fa-globe text-primary-500"></i></div>
       <h3 class="text-2xl font-bold text-gray-800 dark:text-white mb-2">No Public Stories Yet</h3>
       <p class="text-gray-600 dark:text-gray-400 mb-6">Be the first to share your story with the community!</p>
       <a href="<?php echo e(app_base_url()); ?>/create.php" class="inline-block px-8 py-3 rounded-full bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-medium shadow-lg hover:shadow-xl transition">

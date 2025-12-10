@@ -43,6 +43,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (dropdownBtn && dropdownMenu) {
       dropdownBtn.addEventListener('click', (e) => {
         e.stopPropagation();
+        // Position the dropdown
+        const rect = dropdownBtn.getBoundingClientRect();
+        dropdownMenu.style.top = (rect.bottom + 8) + 'px';
+        dropdownMenu.style.right = (window.innerWidth - rect.right) + 'px';
         dropdownMenu.classList.toggle('hidden');
       });
       

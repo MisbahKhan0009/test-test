@@ -64,7 +64,7 @@
     </div>
   </footer>
 
-  <script src="<?php echo e(rtrim(app_base_url(),'/')); ?>/assets/js/app.js"></script>
+  <script src="<?php echo e(rtrim(app_base_url(),'/')); ?>/assets/js/app.js?v=<?php echo time(); ?>"></script>
   <script>
 function togglePassword(id) {
   const input = document.getElementById(id || "password");

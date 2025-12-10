@@ -4,9 +4,9 @@ require_once __DIR__ . '/../lib/utils.php';
 $authed = is_logged_in();
 $base = rtrim(app_base_url(), '/');
 ?>
-<nav class="w-full">
-  <div class="container mx-auto px-4 pt-6 pb-4">
-    <div class="glass rounded-2xl shadow-xl p-4 flex items-center justify-between">
+<nav class="glass w-full sticky top-0 z-50 shadow-xl overflow-visible">
+  <div class="container mx-auto px-4 py-4 overflow-visible">
+    <div class="flex items-center justify-between overflow-visible">
       <!-- Fancy Logo -->
       <a href="<?php echo e($base); ?>/dashboard.php" class="flex items-center gap-3 hover:opacity-90 transition group no-underline">
         <!-- Logo Icon with gradient and artistic elements -->
@@ -25,7 +25,7 @@ $base = rtrim(app_base_url(), '/');
           </span>
         </div>
       </a>
-      <div class="flex items-center gap-2 md:gap-4 flex-wrap justify-end">
+      <div class="flex items-center gap-2 md:gap-4 flex-wrap justify-end overflow-visible">
         <?php if ($authed): ?>
           <a href="<?php echo e($base); ?>/dashboard.php" class="px-4 py-2 rounded-full bg-white/70 hover:bg-white/90 text-gray-700 dark:text-gray-200 dark:bg-gray-800/70 dark:hover:bg-gray-800 transition shadow-sm hover:shadow-md text-sm md:text-base">
             <i class="fas fa-home mr-1"></i>My Posts
@@ -48,23 +48,23 @@ $base = rtrim(app_base_url(), '/');
           </a>
           <?php endif; ?>
           <!-- Profile Dropdown -->
-          <div class="relative">
+          <div class="relative overflow-visible">
             <button id="profileDropdown" class="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center text-white font-bold shadow-md hover:shadow-lg transition text-lg" aria-label="Profile menu">
               <?php echo strtoupper(substr(current_username(), 0, 1)); ?>
             </button>
             <!-- Dropdown Menu -->
-            <div id="profileMenu" class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-2xl shadow-xl py-2 z-50 border border-gray-200 dark:border-gray-700">
-              <div class="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
-                <p class="text-sm font-medium text-gray-800 dark:text-white"><?php echo e(current_username()); ?></p>
+            <div id="profileMenu" class=" glass hidden fixed w-48 rounded-2xl shadow-2xl py-2 border border-white/20" style="z-index: 9999; background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%);">
+              <div class="px-4 py-2 border-b border-white/20">
+                <p class="text-sm font-medium text-white"><?php echo e(current_username()); ?></p>
               </div>
-              <a href="<?php echo e($base); ?>/profile.php" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition">
-                Profile
+              <a href="<?php echo e($base); ?>/profile.php" class="block px-4 py-2 text-sm text-gray-200 hover:bg-white/10 transition">
+                <i class="fas fa-user mr-2"></i>Profile
               </a>
-              <a href="<?php echo e($base); ?>/create.php" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition">
-                ➕ New Entry
+              <a href="<?php echo e($base); ?>/create.php" class="block px-4 py-2 text-sm text-gray-200 hover:bg-white/10 transition">
+                <i class="fas fa-plus mr-2"></i>New Entry
               </a>
-              <a href="<?php echo e($base); ?>/logout.php" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-red-900/20 transition">
-                Logout
+              <a href="<?php echo e($base); ?>/logout.php" class="block px-4 py-2 text-sm text-red-300 hover:bg-red-500/20 transition">
+                <i class="fas fa-sign-out-alt mr-2"></i>Logout
               </a>
             </div>
           </div>
