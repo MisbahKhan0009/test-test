@@ -44,7 +44,7 @@ function login_user(string $username, string $password): bool {
     return false;
 }
 
-function register_user(string $username, string $password): array {
+function register_user(string $username, string $password, string $security_question = '', string $security_answer = ''): array {
     $pdo = get_pdo();
     // Ensure unique username
     $exists = $pdo->prepare('SELECT 1 FROM users WHERE username = ?');
@@ -53,9 +53,11 @@ function register_user(string $username, string $password): array {
         return [false, 'Username already taken'];
     }
     $hash = password_hash($password, PASSWORD_DEFAULT);
-    $stmt = $pdo->prepare('INSERT INTO users (username, password_hash) VALUES (?, ?)');
+    $answer_hash = !empty($security_answer) ? password_hash(strtolower(trim($security_answer)), PASSWORD_DEFAULT) : null;
+    
+    $stmt = $pdo->prepare('INSERT INTO users (username, password_hash, security_question, security_answer) VALUES (?, ?, ?, ?)');
     try {
-        $stmt->execute([$username, $hash]);
+        $stmt->execute([$username, $hash, $security_question, $answer_hash]);
         return [true, null];
     } catch (Throwable $e) {
         return [false, 'Failed to create user'];

@@ -11,8 +11,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $username = trim($_POST['username'] ?? '');
   $password = trim($_POST['password'] ?? '');
   $confirm  = trim($_POST['confirm'] ?? '');
+  $security_question = trim($_POST['security_question'] ?? '');
+  $security_answer = trim($_POST['security_answer'] ?? '');
 
-  if ($username === '' || $password === '' || $confirm === '') {
+  if ($username === '' || $password === '' || $confirm === '' || $security_question === '' || $security_answer === '') {
     $error = 'Please fill out all fields';
   } elseif (strlen($username) < 3) {
     $error = 'Username must be at least 3 characters';
@@ -21,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   } elseif ($password !== $confirm) {
     $error = 'Passwords do not match';
   } else {
-    [$ok, $msg] = register_user($username, $password);
+    [$ok, $msg] = register_user($username, $password, $security_question, $security_answer);
     if ($ok) {
       flash('Account created! Please log in.', 'success');
       redirect('index.php');
@@ -81,6 +83,31 @@ include __DIR__ . '/partials/head.php';
             👀
           </span>
         </div>
+      </div>
+
+      <div>
+        <label class="block text-sm text-gray-700 mb-1">Security Question</label>
+        <select 
+          name="security_question" 
+          required 
+          class="w-full rounded-2xl px-4 py-3 bg-white/70 focus:bg-white outline-none border border-primary-100 focus:border-primary-400 shadow-sm transition">
+          <option value="">Select a question...</option>
+          <option value="What is your favorite color?">What is your favorite color?</option>
+          <option value="What city were you born in?">What city were you born in?</option>
+          <option value="What is your pet's name?">What is your pet's name?</option>
+          <option value="What is your mother's maiden name?">What is your mother's maiden name?</option>
+          <option value="What was your first school's name?">What was your first school's name?</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-sm text-gray-700 mb-1">Security Answer</label>
+        <input 
+          type="text" 
+          name="security_answer" 
+          required 
+          class="w-full rounded-2xl px-4 py-3 bg-white/70 focus:bg-white outline-none border border-primary-100 focus:border-primary-400 shadow-sm transition"
+        />
       </div>
 
       <button type="submit" class="w-full rounded-2xl bg-primary-600 hover:bg-primary-700 text-white py-3 shadow-lg transition">Sign Up</button>

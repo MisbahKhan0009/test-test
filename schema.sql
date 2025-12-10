@@ -11,7 +11,9 @@ CREATE TABLE IF NOT EXISTS users (
   full_name VARCHAR(100) NULL,
   date_of_birth DATE NULL,
   profile_pic VARCHAR(255) NULL,
-  password_hash VARCHAR(255) NOT NULL
+  password_hash VARCHAR(255) NOT NULL,
+  security_question VARCHAR(255) NULL,
+  security_answer VARCHAR(255) NULL
 ) ENGINE=InnoDB;
 
 -- Entries table

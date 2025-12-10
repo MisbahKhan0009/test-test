@@ -42,10 +42,10 @@ $base = rtrim(app_base_url(), '/');
                 <p class="text-sm font-medium text-gray-800 dark:text-white"><?php echo e(current_username()); ?></p>
               </div>
               <a href="<?php echo e($base); ?>/profile.php" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition">
-                👤 Profile
+              Profile
               </a>
               <a href="<?php echo e($base); ?>/logout.php" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-red-900/20 transition">
-                🚪 Logout
+                Logout
               </a>
             </div>
           </div>
