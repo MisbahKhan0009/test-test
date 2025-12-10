@@ -854,7 +854,17 @@ BEGIN
     );
 END//
 
--- Trigger: Create entry version on update
+-- Trigger: Increment version before update
+CREATE TRIGGER IF NOT EXISTS trg_increment_version
+BEFORE UPDATE ON entries
+FOR EACH ROW
+BEGIN
+    IF OLD.content != NEW.content OR OLD.title != NEW.title OR OLD.mood != NEW.mood THEN
+        SET NEW.version = OLD.version + 1;
+    END IF;
+END//
+
+-- Trigger: Create entry version after update
 CREATE TRIGGER IF NOT EXISTS trg_create_entry_version
 AFTER UPDATE ON entries
 FOR EACH ROW
@@ -865,9 +875,6 @@ BEGIN
         ) VALUES (
             NEW.entry_id, OLD.version, OLD.title, OLD.content, OLD.mood, NEW.user_id
         );
-        
-        -- Increment version number
-        SET NEW.version = OLD.version + 1;
     END IF;
 END//
 
