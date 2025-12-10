@@ -54,7 +54,7 @@ $flashes = consume_flashes();
   </script>
   <link rel="stylesheet" href="assets/css/theme.css?v=<?php echo @filemtime(__DIR__.'/../assets/css/theme.css'); ?>" />
 </head>
-<body class="min-h-screen gradient-bg">
+<body class="min-h-screen gradient-bg flex flex-col">
   <?php $isAuthed = is_logged_in(); ?>
   <?php include __DIR__ . '/nav.php'; ?>
   <?php if (!empty($flashes)): ?>
@@ -80,4 +80,4 @@ $flashes = consume_flashes();
       <?php endforeach; ?>
     </div>
   <?php endif; ?>
-  <main class="container mx-auto px-4 py-8">
+  <main class="flex-1 container mx-auto px-4 py-8">
