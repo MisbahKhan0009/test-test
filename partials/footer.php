@@ -6,9 +6,12 @@
       <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
         <!-- Brand -->
         <div>
-          <h3 class="text-lg font-bold text-primary-600 mb-2">MyDiary</h3>
+          <div class="flex items-center gap-2 mb-3">
+            <div class="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-700 rounded-lg flex items-center justify-center text-white text-lg">🎨</div>
+            <h3 class="font-display text-lg font-bold bg-gradient-to-r from-primary-600 to-primary-700 bg-clip-text text-transparent">Life Canvas</h3>
+          </div>
           <p class="text-sm text-gray-600 dark:text-gray-400">
-            Your personal space for thoughts, memories, and reflections.
+            Express yourself through daily entries. Your personal canvas for stories, thoughts, and memories.
           </p>
         </div>
 
@@ -54,8 +57,8 @@
       <!-- Divider -->
       <div class="border-t border-current/10 pt-8 mt-8">
         <div class="flex flex-col md:flex-row items-center justify-between text-sm text-gray-600 dark:text-gray-400">
-          <p>&copy; 2025 MyDiary. All rights reserved.</p>
-          <p>Crafted with ❄️ using Arctic Design</p>
+          <p>&copy; 2025 Life Canvas. All rights reserved.</p>
+          <p>Crafted with 🎨 for your creative expression</p>
         </div>
       </div>
     </div>

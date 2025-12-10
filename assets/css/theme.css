@@ -266,3 +266,46 @@ html { scroll-behavior: smooth; }
   body::after { animation: none; }
 }
 
+/* Logo Animation */
+@keyframes logoGlow {
+  0%, 100% { box-shadow: 0 0 20px rgba(2, 132, 199, 0.3); }
+  50% { box-shadow: 0 0 30px rgba(2, 132, 199, 0.6); }
+}
+
+@keyframes logoBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+
+/* Enhanced Font Definitions */
+@supports (font-family: 'Playfair Display') {
+  body {
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  .font-display {
+    font-family: 'Playfair Display', serif;
+  }
+}
+
+/* Logo Styling */
+nav a[href*="dashboard"] .relative {
+  animation: logoGlow 3s ease-in-out infinite;
+}
+
+nav a[href*="dashboard"]:hover .relative {
+  animation: logoGlow 1.5s ease-in-out infinite;
+}
+
+/* Fancy gradient text for logo */
+.font-display {
+  letter-spacing: -0.02em;
+  font-weight: 900;
+}
+
+/* Title styling */
+body {
+  font-family: 'Poppins', sans-serif;
+}
+
+

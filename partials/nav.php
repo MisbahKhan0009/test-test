@@ -7,8 +7,25 @@ $base = rtrim(app_base_url(), '/');
 <nav class="w-full">
   <div class="container mx-auto px-4 pt-6 pb-4">
     <div class="glass rounded-2xl shadow-xl p-4 flex items-center justify-between">
-      <a href="<?php echo e($base); ?>/dashboard.php" class="text-xl font-bold bg-gradient-to-r from-primary-600 to-accent bg-clip-text text-transparent hover:from-primary-700 hover:to-primary-600 transition">
-        ❄️ MyDiary
+      <!-- Fancy Logo -->
+      <a href="<?php echo e($base); ?>/dashboard.php" class="flex items-center gap-3 hover:opacity-90 transition group">
+        <!-- Logo Icon with gradient and artistic elements -->
+        <div class="relative w-12 h-12 flex items-center justify-center">
+          <div class="absolute inset-0 bg-gradient-to-br from-primary-400 to-primary-600 rounded-lg opacity-80 group-hover:opacity-100 transition blur-sm"></div>
+          <div class="relative bg-gradient-to-br from-primary-500 to-primary-700 rounded-lg w-10 h-10 flex items-center justify-center text-white text-xl font-bold shadow-lg">
+            🎨
+          </div>
+        </div>
+        
+        <!-- Fancy Logo Text -->
+        <div class="flex flex-col leading-tight">
+          <span class="font-display text-2xl font-black bg-gradient-to-r from-primary-600 via-primary-500 to-primary-700 bg-clip-text text-transparent group-hover:from-primary-700 group-hover:to-primary-600 transition">
+            Life Canvas
+          </span>
+          <span class="font-body text-xs text-gray-500 dark:text-gray-400 tracking-widest uppercase font-medium">
+            Your Stories, Our Canvas
+          </span>
+        </div>
       </a>
       <div class="flex items-center gap-2 md:gap-4 flex-wrap justify-end">
         <?php if ($authed): ?>
