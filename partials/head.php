@@ -7,25 +7,60 @@ $flashes = consume_flashes();
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title><?php echo isset($pageTitle) ? e($pageTitle) . ' • ' : ''; ?>Diary App</title>
+  <title><?php echo isset($pageTitle) ? e($pageTitle) . ' • ' : ''; ?>Life Canvas</title>
+  <!-- Google Fonts for fancy typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  
+  <!-- Theme initialization - runs immediately to prevent flash -->
+  <script>
+    (function() {
+      try {
+        const saved = localStorage.getItem('theme');
+        const theme = saved || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch(e) {}
+    })();
+  </script>
+  
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       darkMode: 'class',
       theme: {
         extend: {
+          fontFamily: {
+            'display': ['Playfair Display', 'serif'],
+            'body': ['Poppins', 'sans-serif'],
+          },
           colors: {
             primary: {
-              50: '#eef2ff',
-              100: '#e0e7ff',
-              200: '#c7d2fe',
-              300: '#a5b4fc',
-              400: '#818cf8',
-              500: '#6366f1',
-              600: '#4f46e5',
-              700: '#4338ca',
-              800: '#3730a3',
-              900: '#312e81'
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              200: '#bae6fd',
+              300: '#7dd3fc',
+              400: '#38bdf8',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              700: '#0369a1',
+              800: '#075985',
+              900: '#0c3d66'
+            },
+            arctic: {
+              50: '#f0f4f8',
+              100: '#e1eef7',
+              200: '#d4e3ed',
+              300: '#b8cfe1',
+              400: '#8fa8c5',
+              500: '#6b92b8',
+              600: '#4a73a6',
+              700: '#375a8c',
+              800: '#2d4671',
+              900: '#1a3a4a'
             }
           },
         }
@@ -34,7 +69,7 @@ $flashes = consume_flashes();
   </script>
   <link rel="stylesheet" href="assets/css/theme.css?v=<?php echo @filemtime(__DIR__.'/../assets/css/theme.css'); ?>" />
 </head>
-<body class="min-h-screen gradient-bg">
+<body class="min-h-screen gradient-bg flex flex-col">
   <?php $isAuthed = is_logged_in(); ?>
   <?php include __DIR__ . '/nav.php'; ?>
   <?php if (!empty($flashes)): ?>
@@ -60,4 +95,4 @@ $flashes = consume_flashes();
       <?php endforeach; ?>
     </div>
   <?php endif; ?>
-  <main class="container mx-auto px-4 py-8">
+  <main class="flex-1 container mx-auto px-4 py-8">

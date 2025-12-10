@@ -34,22 +34,55 @@ function attachConfirm(selector, message) {
 
 document.addEventListener('DOMContentLoaded', () => {
   attachConfirm('[data-confirm]','Are you sure? This cannot be undone.');
-  // Theme boot
+  
+  // Profile dropdown toggle
+  try {
+    const dropdownBtn = document.getElementById('profileDropdown');
+    const dropdownMenu = document.getElementById('profileMenu');
+    
+    if (dropdownBtn && dropdownMenu) {
+      dropdownBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dropdownMenu.classList.toggle('hidden');
+      });
+      
+      // Close dropdown when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!dropdownBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
+          dropdownMenu.classList.add('hidden');
+        }
+      });
+      
+      // Close dropdown on Escape key
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !dropdownMenu.classList.contains('hidden')) {
+          dropdownMenu.classList.add('hidden');
+        }
+      });
+    }
+  } catch {}
+  
+  // Theme toggle button
   try {
     const root = document.documentElement;
-    const saved = localStorage.getItem('theme');
-    let theme = saved || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-    root.setAttribute('data-theme', theme);
     const btn = document.getElementById('themeToggle');
-    const applyLabel = () => { if (!btn) return; btn.textContent = theme === 'dark' ? 'Light' : 'Dark'; btn.setAttribute('aria-label', `Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`); };
-    applyLabel();
     if (btn) {
+      let theme = root.getAttribute('data-theme') || 'light';
+      const updateIcon = () => {
+        const icon = btn.querySelector('span');
+        if (icon) {
+          icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+        }
+        btn.setAttribute('aria-label', `Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`);
+      };
+      updateIcon();
+      
       btn.addEventListener('click', (e) => {
         e.preventDefault();
         theme = theme === 'dark' ? 'light' : 'dark';
         root.setAttribute('data-theme', theme);
         localStorage.setItem('theme', theme);
-        applyLabel();
+        updateIcon();
       });
     }
   } catch {}

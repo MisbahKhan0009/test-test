@@ -1,34 +1,48 @@
 <?php
 require_once(__DIR__ . '/config/db.php');
+session_start();
 
 $message = '';
+$step = 'username'; // username, security_question, or success
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = trim($_POST['email']);
+    if (isset($_POST['username'])) {
+        // Step 1: Check if username exists and has security question
+        $username = trim($_POST['username']);
+        
+        $stmt = $pdo->prepare("SELECT user_id, security_question FROM users WHERE username = ?");
+        $stmt->execute([$username]);
+        $user = $stmt->fetch();
 
-    // Check if user exists
-    $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
-    $stmt->execute([$email]);
-    $user = $stmt->fetch();
+        if ($user && $user['security_question']) {
+            $_SESSION['reset_user_id'] = $user['user_id'];
+            $_SESSION['reset_username'] = $username;
+            $_SESSION['security_question'] = $user['security_question'];
+            $step = 'security_question';
+        } else {
+            $message = $user ? 'No security question set for this account. Please contact admin.' : 'Username not found.';
+        }
+    } elseif (isset($_POST['security_answer'])) {
+        // Step 2: Verify security answer
+        if (!isset($_SESSION['reset_user_id'])) {
+            $message = 'Session expired. Please start over.';
+            $step = 'username';
+        } else {
+            $answer = trim($_POST['security_answer']);
+            
+            $stmt = $pdo->prepare("SELECT security_answer FROM users WHERE user_id = ?");
+            $stmt->execute([$_SESSION['reset_user_id']]);
+            $user = $stmt->fetch();
 
-    if ($user) {
-        // Create token
-        $token = bin2hex(random_bytes(32));
-        $expires = date("Y-m-d H:i:s", time() + 3600); // 1 hour
-
-        // Save token
-        $stmt = $pdo->prepare("UPDATE users SET password_reset_token=?, password_reset_expires=? WHERE id=?");
-        $stmt->execute([$token, $expires, $user['id']]);
-
-        // Build reset link
-        $resetLink = "http://yourdomain.com/reset_password.php?token=$token";
-
-        // Send email
-        mail($email, "Password Reset", "Click to reset: $resetLink");
-
-        $message = "A reset link has been sent to your email.";
-    } else {
-        $message = "Email not found.";
+            if ($user && password_verify(strtolower($answer), $user['security_answer'])) {
+                // Answer is correct, redirect to reset password page
+                header('Location: reset_password.php');
+                exit;
+            } else {
+                $message = 'Incorrect answer. Please try again.';
+                $step = 'security_question';
+            }
+        }
     }
 }
 
@@ -45,36 +59,75 @@ include __DIR__ . '/partials/head.php';
     </h1>
 
     <?php if ($message): ?>
-      <div class="mb-4 px-4 py-3 rounded-xl bg-green-50 dark:bg-green-900/40 border border-green-300 dark:border-green-700 text-green-700 dark:text-green-300">
+      <div class="mb-4 px-4 py-3 rounded-xl bg-red-50 dark:bg-red-900/40 border border-red-300 dark:border-red-700 text-red-700 dark:text-red-300">
         <?= htmlspecialchars($message) ?>
       </div>
     <?php endif; ?>
 
-    <form method="POST" class="space-y-4">
+    <?php if ($step === 'username'): ?>
+      <form method="POST" class="space-y-4">
+        <div>
+          <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">
+            Enter your username
+          </label>
+          <input 
+            type="text" 
+            name="username" 
+            required 
+            class="w-full rounded-2xl px-4 py-3 
+            bg-white/70 dark:bg-gray-700/50 
+            focus:bg-white dark:focus:bg-gray-700 
+            outline-none border border-primary-100 
+            focus:border-primary-400 shadow-sm transition" 
+          />
+        </div>
 
-      <div>
-        <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">
-          Enter your email address
-        </label>
-        <input 
-          type="email" 
-          name="email" 
-          required 
-          class="w-full rounded-2xl px-4 py-3 
-          bg-white/70 dark:bg-gray-700/50 
-          focus:bg-white dark:focus:bg-gray-700 
-          outline-none border border-primary-100 
-          focus:border-primary-400 shadow-sm transition" 
-        />
+        <button 
+          type="submit" 
+          class="w-full rounded-2xl bg-primary-600 hover:bg-primary-700 text-white py-3 shadow-lg transition">
+          Continue
+        </button>
+      </form>
+    <?php elseif ($step === 'security_question'): ?>
+      <div class="mb-4 px-4 py-3 rounded-xl bg-blue-50 dark:bg-blue-900/40 border border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-300">
+        <strong>Security Question:</strong><br/>
+        <?= htmlspecialchars($_SESSION['security_question']) ?>
       </div>
 
-      <button 
-        type="submit" 
-        class="w-full rounded-2xl bg-primary-600 hover:bg-primary-700 text-white py-3 shadow-lg transition">
-        Send Reset Link
-      </button>
+      <form method="POST" class="space-y-4">
+        <div>
+          <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">
+            Your Answer
+          </label>
+          <input 
+            type="text" 
+            name="security_answer" 
+            required 
+            class="w-full rounded-2xl px-4 py-3 
+            bg-white/70 dark:bg-gray-700/50 
+            focus:bg-white dark:focus:bg-gray-700 
+            outline-none border border-primary-100 
+            focus:border-primary-400 shadow-sm transition" 
+          />
+        </div>
 
-    </form>
+        <button 
+          type="submit" 
+          class="w-full rounded-2xl bg-primary-600 hover:bg-primary-700 text-white py-3 shadow-lg transition">
+          Verify Answer
+        </button>
+      </form>
+
+      <form method="POST" class="mt-3">
+        <button 
+          type="submit" 
+          name="username" 
+          value="" 
+          class="text-sm text-primary-700 dark:text-primary-300 hover:underline">
+          ← Start over
+        </button>
+      </form>
+    <?php endif; ?>
 
     <p class="text-sm text-gray-600 dark:text-gray-400 mt-4">
       Remember your password?  

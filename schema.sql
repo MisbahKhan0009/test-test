@@ -11,7 +11,9 @@ CREATE TABLE IF NOT EXISTS users (
   full_name VARCHAR(100) NULL,
   date_of_birth DATE NULL,
   profile_pic VARCHAR(255) NULL,
-  password_hash VARCHAR(255) NOT NULL
+  password_hash VARCHAR(255) NOT NULL,
+  security_question VARCHAR(255) NULL,
+  security_answer VARCHAR(255) NULL
 ) ENGINE=InnoDB;
 
 -- Entries table
@@ -21,6 +23,7 @@ CREATE TABLE IF NOT EXISTS entries (
   title VARCHAR(150) NOT NULL,
   content TEXT NOT NULL,
   mood VARCHAR(30) NULL,
+  music_link VARCHAR(500) NULL,
   timestamp DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_entries_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
@@ -39,3 +42,4 @@ CREATE INDEX idx_entries_user ON entries(user_id);
 CREATE INDEX idx_entries_timestamp ON entries(timestamp);
 CREATE INDEX idx_entries_title ON entries(title);
 CREATE INDEX idx_media_entry ON media(entry_id);
+
