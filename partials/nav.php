@@ -4,7 +4,7 @@ require_once __DIR__ . '/../lib/utils.php';
 $authed = is_logged_in();
 $base = rtrim(app_base_url(), '/');
 ?>
-<nav class="glass w-full sticky top-0 z-50 shadow-xl overflow-visible">
+<nav class="glass container mx-auto sticky top-5 z-50 shadow-xl overflow-visible">
   <div class="container mx-auto px-4 py-4 overflow-visible">
     <div class="flex items-center justify-between overflow-visible">
       <!-- Fancy Logo -->
@@ -72,9 +72,7 @@ $base = rtrim(app_base_url(), '/');
           <a href="<?php echo e($base); ?>/index.php" class="px-4 py-2 rounded-full bg-white/70 hover:bg-white/90 text-gray-700 transition text-sm md:text-base">Login</a>
           <a href="<?php echo e($base); ?>/signup.php" class="px-4 py-2 rounded-full bg-primary-600 hover:bg-primary-700 text-white transition shadow-md hover:shadow-lg text-sm md:text-base font-medium">Sign Up</a>
         <?php endif; ?>
-        <button id="themeToggle" class="px-3 py-2 rounded-full bg-white/70 hover:bg-white/90 text-gray-700 dark:bg-gray-700/70 dark:text-gray-200 transition border border-primary-200 dark:border-gray-600 text-sm" aria-label="Switch theme" title="Toggle dark/light theme">
-          <i class="fas fa-moon"></i>
-        </button>
+        
       </div>
     </div>
   </div>

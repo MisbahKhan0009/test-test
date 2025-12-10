@@ -230,7 +230,7 @@ include __DIR__ . '/partials/head.php';
             <?php if (!empty($e['tags'])): ?>
               <div class="mt-2 flex flex-wrap gap-1">
                 <?php $tag_list = explode(', ', $e['tags']); foreach (array_slice($tag_list, 0, 3) as $tag): ?>
-                  <span class="inline-block px-2 py-0.5 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs">
+                  <span class="inline-block px-2 py-0.5 rounded-full bg-gray-200 dark:bg-gray-700 text-black dark:text-gray-300 text-xs">
                     #<?php echo e($tag); ?>
                   </span>
                 <?php endforeach; ?>

@@ -325,13 +325,13 @@ html { scroll-behavior: smooth; }
 }
 
 /* Enhanced Font Definitions */
-@supports (font-family: 'Playfair Display') {
+@supports (font-family: 'Macondo Swash Caps') {
   body {
     font-family: 'Poppins', sans-serif;
   }
   
   .font-display {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Macondo Swash Caps', cursive;
   }
 }
 
