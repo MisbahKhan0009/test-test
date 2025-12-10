@@ -151,33 +151,40 @@ Your Personal Diary application has been upgraded to a complex, production-ready
 
 ---
 
-## 🚀 Installation Instructions
+## 🚀 Installation Instructions (SINGLE FILE IMPORT)
 
-### Step 1: Backup Your Current Database
-```sql
--- In phpMyAdmin, export your current diary_app database
-```
-
-### Step 2: Run Migration Script
-1. Navigate to: `http://localhost/CSE311-Diary/Personal-Diary/migrate.php`
-2. Click "Run Migration" button
-3. Wait for completion (adds new columns to existing tables)
-
-### Step 3: Update Database Schema
+### Step 1: Import Complete Database
 1. Open phpMyAdmin
-2. Select `diary_app` database
-3. Go to SQL tab
-4. Copy entire contents of `schema.sql`
-5. Paste and execute (creates all new tables, views, procedures, triggers)
+2. Go to SQL tab
+3. Copy the **entire contents** of `schema.sql` file
+4. Paste into the SQL query box
+5. Click "Go" button
+6. Wait for import to complete (may take 10-20 seconds)
 
-**Note:** The schema uses `CREATE TABLE IF NOT EXISTS` so it won't affect existing data.
+**What This Does:**
+- ✅ Drops old database (if exists)
+- ✅ Creates fresh `diary_app` database
+- ✅ Creates all 20 tables
+- ✅ Inserts 8 sample users
+- ✅ Inserts 18 diary entries
+- ✅ Creates 6 categories
+- ✅ Creates 10 tags
+- ✅ Adds 5 sample images
+- ✅ Creates all views, procedures, triggers, functions
+- ✅ Sets up indexes and constraints
 
-### Step 4: Verify Installation
-1. Refresh dashboard - should see new filter options
-2. Visit Categories page - default categories should appear
-3. Create a new entry - should see category/tag options
-4. Check Analytics page - stats should populate
-5. If you're user_id 1, visit Admin panel
+### Step 2: Login and Test
+1. Go to: `http://localhost/CSE311-Diary/Personal-Diary/`
+2. Use credentials from `USER_CREDENTIALS.txt`
+3. **Admin login**: username: `admin`, password: `password123`
+4. Start exploring!
+
+### Step 3: Verify Everything Works
+1. ✅ Dashboard shows sample entries with filters
+2. ✅ Categories page displays 6 default categories
+3. ✅ Analytics page shows statistics
+4. ✅ Admin Panel accessible (login as admin)
+5. ✅ Create new entry with categories and tags
 
 ---
 
@@ -474,8 +481,8 @@ roles (M) ──→ (M) permissions
 ## ✅ Files Modified/Created
 
 ### Created:
-- `schema.sql` (completely rewritten)
-- `migrate.php` (new)
+- `schema.sql` (complete database with sample data)
+- `USER_CREDENTIALS.txt` (all login credentials)
 - `admin.php` (new)
 - `categories.php` (new)
 - `analytics.php` (new)
@@ -491,6 +498,10 @@ roles (M) ──→ (M) permissions
 - `edit.php` (add category/tags editing)
 - `view.php` (display category/tags/reactions)
 - `profile.php` (add bio, stats display)
+
+### Removed (No Longer Needed):
+- `migrate.php` (replaced by single schema.sql import)
+- `populate_entries.sql` (merged into schema.sql)
 
 ---
 

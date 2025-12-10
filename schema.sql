@@ -1,7 +1,15 @@
+-- =====================================================
 -- MySQL schema for Diary App (Enhanced for DBMS Project)
--- Run this in phpMyAdmin or MySQL client
+-- Complete Database Setup - Single File Import
+-- =====================================================
+-- Instructions:
+-- 1. Drop existing database if you want fresh start: DROP DATABASE IF EXISTS diary_app;
+-- 2. Import this entire file in phpMyAdmin SQL tab
+-- 3. All tables, data, views, procedures, triggers will be created
+-- =====================================================
 
-CREATE DATABASE IF NOT EXISTS `diary_app` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+DROP DATABASE IF EXISTS `diary_app`;
+CREATE DATABASE `diary_app` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE `diary_app`;
 
 -- ======================
@@ -342,8 +350,164 @@ CREATE INDEX idx_audit_action ON audit_log(action_type, created_at);
 CREATE INDEX idx_versions_entry ON entry_versions(entry_id);
 CREATE INDEX idx_sessions_user ON user_sessions(user_id);
 
+-- ==============================================
+-- 7. SAMPLE DATA POPULATION
+-- ==============================================
+
+-- Insert sample users with various roles
+-- Password for all users: "password123"
+-- Security answer for all users: "blue"
+
+INSERT INTO users (username, full_name, email, password_hash, security_question, security_answer, role_id, is_active, created_at) VALUES
+-- Admin User
+('admin', 'Admin User', 'admin@diary.com', 
+ '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 
+ 'What is your favorite color?', 
+ '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 
+ 1, TRUE, '2024-01-15 10:00:00'),
+
+-- Premium Users
+('john_doe', 'John Doe', 'john@example.com', 
+ '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 
+ 'What is your favorite color?', 
+ '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 
+ 2, TRUE, '2024-02-20 14:30:00'),
+
+('jane_smith', 'Jane Smith', 'jane@example.com', 
+ '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 
+ 'What is your favorite color?', 
+ '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 
+ 2, TRUE, '2024-03-10 09:15:00'),
+
+-- Regular Users
+('alice_wonder', 'Alice Wonder', 'alice@example.com', 
+ '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 
+ 'What is your favorite color?', 
+ '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 
+ 3, TRUE, '2024-04-05 16:45:00'),
+
+('bob_builder', 'Bob Builder', 'bob@example.com', 
+ '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 
+ 'What is your favorite color?', 
+ '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 
+ 3, TRUE, '2024-05-12 11:20:00'),
+
+('charlie_brown', 'Charlie Brown', 'charlie@example.com', 
+ '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 
+ 'What is your favorite color?', 
+ '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 
+ 3, TRUE, '2024-06-18 08:00:00'),
+
+('diana_prince', 'Diana Prince', 'diana@example.com', 
+ '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 
+ 'What is your favorite color?', 
+ '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 
+ 3, TRUE, '2024-07-22 13:30:00'),
+
+('emma_watson', 'Emma Watson', 'emma@example.com', 
+ '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 
+ 'What is your favorite color?', 
+ '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 
+ 3, TRUE, '2024-08-14 10:45:00');
+
+-- Insert sample diary entries for demonstration
+INSERT INTO entries (user_id, category_id, title, content, mood, location, privacy_level, timestamp) VALUES
+-- Admin's entries
+(1, 1, 'First Day as Admin', 'Today I set up the entire diary system. It feels great to have everything organized and ready for users.', 'Happy', 'New York, USA', 'private', '2024-01-15 18:00:00'),
+(1, 2, 'System Launch', 'Successfully launched the diary application. All features are working perfectly!', 'Excited', 'New York, USA', 'public', '2024-01-20 14:30:00'),
+
+-- John's entries
+(2, 3, 'Trip to Paris', 'Amazing day exploring the Eiffel Tower and trying authentic French cuisine. The city is magical!', 'Excited', 'Paris, France', 'friends', '2024-03-15 20:00:00'),
+(2, 4, 'New Year Goals', 'Setting ambitious goals for 2024: Read 50 books, learn Spanish, and run a marathon. Let''s do this!', 'Reflective', 'Boston, USA', 'private', '2024-01-01 09:00:00'),
+(2, 1, 'Sunday Thoughts', 'Spent the day reflecting on life and relationships. Feeling grateful for family and friends.', 'Calm', 'Boston, USA', 'private', '2024-02-25 16:00:00'),
+
+-- Jane's entries
+(3, 5, 'Morning Yoga', 'Started my day with 30 minutes of yoga. Feeling centered and energized!', 'Calm', 'Los Angeles, USA', 'public', '2024-04-10 07:00:00'),
+(3, 6, 'Grateful Heart', 'Today I''m grateful for: my health, supportive friends, and this beautiful sunshine.', 'Happy', 'Los Angeles, USA', 'public', '2024-04-15 12:00:00'),
+(3, 2, 'Project Deadline', 'Working late to finish the presentation. Stressful but I know I can do it!', 'Angry', 'Los Angeles, USA', 'private', '2024-04-20 22:00:00'),
+
+-- Alice's entries
+(4, 1, 'Childhood Memories', 'Found old photo albums today. So many wonderful memories flooding back!', 'Reflective', 'Seattle, USA', 'private', '2024-05-01 14:00:00'),
+(4, 3, 'Beach Weekend', 'Perfect beach day with friends. Sun, sand, and laughter - what more could I ask for?', 'Happy', 'Santa Monica, USA', 'friends', '2024-05-15 18:00:00'),
+
+-- Bob's entries
+(5, 2, 'Career Milestone', 'Got promoted today! All the hard work has paid off. Celebrating with the team tonight.', 'Excited', 'Chicago, USA', 'public', '2024-06-01 17:00:00'),
+(5, 4, 'Learning Guitar', 'Week 3 of guitar lessons. My fingers hurt but I''m making progress!', 'Happy', 'Chicago, USA', 'private', '2024-06-10 20:00:00'),
+
+-- Charlie's entries
+(6, 1, 'Rainy Day Blues', 'Sometimes we all need a quiet day at home. Reading books and drinking tea.', 'Calm', 'Portland, USA', 'private', '2024-07-05 11:00:00'),
+(6, 5, 'Marathon Training', 'Completed 10 miles today! My longest run yet. Exhausted but proud.', 'Excited', 'Portland, USA', 'public', '2024-07-20 07:00:00'),
+
+-- Diana's entries
+(7, 6, 'Thankful Thursday', 'Grateful for: morning coffee, good books, and cozy evenings at home.', 'Happy', 'Austin, USA', 'public', '2024-08-01 19:00:00'),
+(7, 1, 'Family Visit', 'Parents came to visit. Nothing beats home-cooked meals and family stories.', 'Happy', 'Austin, USA', 'private', '2024-08-15 21:00:00'),
+
+-- Emma's entries
+(8, 3, 'Mountain Hiking', 'Conquered my first 14er today! The view from the summit was breathtaking.', 'Excited', 'Denver, USA', 'public', '2024-09-01 16:00:00'),
+(8, 2, 'New Project Kickoff', 'Starting a new project at work. Nervous but excited about the challenges ahead.', 'Reflective', 'Denver, USA', 'private', '2024-09-10 09:00:00');
+
+-- Create some sample tags
+INSERT INTO tags (tag_name, usage_count) VALUES
+('travel', 4),
+('goals', 3),
+('fitness', 3),
+('gratitude', 3),
+('work', 4),
+('family', 2),
+('adventure', 3),
+('reflection', 4),
+('health', 2),
+('celebration', 2);
+
+-- Associate tags with entries
+INSERT INTO entry_tags (entry_id, tag_id) VALUES
+-- Admin entries
+(1, 8), (2, 10),
+-- John entries
+(3, 1), (3, 7), (4, 2), (5, 8),
+-- Jane entries
+(6, 4), (6, 9), (7, 4), (8, 5),
+-- Alice entries
+(9, 8), (9, 6), (10, 1), (10, 7),
+-- Bob entries
+(11, 5), (11, 10), (12, 2), (12, 4),
+-- Charlie entries
+(13, 8), (14, 4), (14, 9),
+-- Diana entries
+(15, 4), (15, 6), (16, 6),
+-- Emma entries
+(17, 1), (17, 7), (17, 4), (18, 5), (18, 8);
+
+-- Add some media to entries (image URLs)
+INSERT INTO media (entry_id, file_path, file_type, file_size) VALUES
+(3, 'https://picsum.photos/seed/paris/800/600', 'image/jpeg', 102400),
+(6, 'https://picsum.photos/seed/yoga/800/600', 'image/jpeg', 98304),
+(10, 'https://picsum.photos/seed/beach/800/600', 'image/jpeg', 115200),
+(14, 'https://picsum.photos/seed/marathon/800/600', 'image/jpeg', 108000),
+(17, 'https://picsum.photos/seed/mountain/800/600', 'image/jpeg', 125000);
+
+-- Initialize user stats for all users
+INSERT INTO user_stats (user_id, total_entries, total_words, current_streak, longest_streak, avg_words_per_entry, most_common_mood, last_entry_date) VALUES
+(1, 2, 250, 1, 2, 125.00, 'Happy', '2024-01-20'),
+(2, 3, 400, 2, 3, 133.33, 'Excited', '2024-03-15'),
+(3, 3, 320, 1, 2, 106.67, 'Calm', '2024-04-20'),
+(4, 2, 280, 1, 1, 140.00, 'Happy', '2024-05-15'),
+(5, 2, 260, 1, 2, 130.00, 'Excited', '2024-06-10'),
+(6, 2, 240, 1, 1, 120.00, 'Calm', '2024-07-20'),
+(7, 2, 220, 1, 2, 110.00, 'Happy', '2024-08-15'),
+(8, 2, 300, 1, 1, 150.00, 'Excited', '2024-09-10');
+
+-- Initialize entry stats
+INSERT INTO entry_stats (entry_id, view_count, share_count, comment_count, reaction_count) VALUES
+(1, 5, 0, 0, 0), (2, 12, 1, 0, 2), (3, 25, 3, 1, 5),
+(4, 8, 0, 0, 1), (5, 6, 0, 0, 0), (6, 18, 2, 0, 3),
+(7, 15, 1, 0, 2), (8, 7, 0, 0, 0), (9, 10, 0, 0, 1),
+(10, 22, 2, 1, 4), (11, 30, 3, 2, 6), (12, 9, 0, 0, 1),
+(13, 5, 0, 0, 0), (14, 20, 2, 0, 3), (15, 16, 1, 0, 2),
+(16, 8, 0, 0, 1), (17, 35, 4, 2, 7), (18, 11, 0, 0, 1);
+
 -- ======================
--- 7. VIEWS
+-- 8. VIEWS
 -- ======================
 
 -- View: User dashboard summary

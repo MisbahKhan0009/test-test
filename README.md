@@ -1,23 +1,43 @@
-# Diary / Journal Web App
+# Personal Diary - Enhanced DBMS Project
 
-A modern, colorful diary/journal web app built with PHP (XAMPP), MySQL, and TailwindCSS. Features authentication, CRUD entries, and image/audio uploads.
+A sophisticated diary application with advanced database features for DBMS course demonstration.
 
-## Tech
-- Frontend: HTML + TailwindCSS (via CDN), colorful gradients, rounded cards, smooth animations
-- Backend: PHP 8+ (works on XAMPP)
-- Database: MySQL (XAMPP)
+## 🚀 Quick Start (3 Steps)
 
-## Features
-- User signup/login/logout (password hashing, sessions)
-- Create, view, edit, delete diary entries
-- Upload multiple images/audio per entry
-- Responsive, modern UI with Tailwind components
+### 1️⃣ Import Database
+- Open **phpMyAdmin** → **SQL** tab
+- Copy & paste entire `schema.sql` file
+- Click **Go** ✅
+
+### 2️⃣ Login
+- URL: `http://localhost/CSE311-Diary/Personal-Diary/`
+- **Username:** `admin` | **Password:** `password123`
+
+### 3️⃣ Explore
+📊 Dashboard | 🏷️ Categories | 📈 Analytics | 👥 Admin Panel
+
+---
+
+## 📁 Key Files
+- **`schema.sql`** - Complete database (import this ONE file)
+- **`USER_CREDENTIALS.txt`** - All 8 user logins
+- **`IMPLEMENTATION_GUIDE.md`** - Full documentation
+
+## 👥 Sample Users (password: password123)
+admin, john_doe, jane_smith, alice_wonder, bob_builder, charlie_brown, diana_prince, emma_watson
+
+## ✨ Features
+✅ 20 tables | 5 views | 6 procedures | 10 triggers | 30+ indexes  
+✅ Advanced search & filters | Categories | Tags | Analytics  
+✅ Role-based access | Admin panel | Sample data included
+
+## 🎓 DBMS Concepts
+Normalization • Foreign Keys • JOINs • Subqueries • Triggers • Stored Procedures • Views • Indexing • Transactions • Full-text Search
 
 ## Setup (Windows + XAMPP)
-1. Start Apache and MySQL in XAMPP Control Panel.
-2. Create database and tables:
-   - Open phpMyAdmin (http://localhost/phpmyadmin) → Import `schema.sql` from this project.
-3. Copy the project folder under `C:/xampp/htdocs/`.
+1. Start Apache and MySQL in XAMPP Control Panel
+2. Import `schema.sql` in phpMyAdmin
+3. Login with admin credentials
 4. Visit the app:
    - `http://localhost/CSE311LBaseline/index.php` (or your base path)
 
