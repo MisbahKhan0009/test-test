@@ -88,11 +88,11 @@ include __DIR__ . '/partials/head.php';
       </div>
 
       <div>
-        <label class="block text-sm text-gray-700 mb-1">Security Question</label>
+        <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Security Question</label>
         <select 
           name="security_question" 
           required 
-          class="w-full rounded-2xl px-4 py-3 bg-white/70 focus:bg-white outline-none border border-primary-100 focus:border-primary-400 shadow-sm transition">
+          class="w-full rounded-2xl px-4 py-3 bg-white/70 dark:bg-gray-700/50 focus:bg-white dark:focus:bg-gray-700 text-gray-900 dark:text-gray-100 outline-none border border-primary-100 dark:border-gray-600 focus:border-primary-400 shadow-sm transition">
           <option value="">Select a question...</option>
           <option value="What is your favorite color?">What is your favorite color?</option>
           <option value="What city were you born in?">What city were you born in?</option>

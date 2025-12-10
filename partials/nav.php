@@ -37,8 +37,8 @@ $base = rtrim(app_base_url(), '/');
             </button>
             
             <!-- Dropdown Menu -->
-            <div id="profileMenu" class="hidden absolute right-0 mt-2 w-48 glass rounded-2xl shadow-xl py-2 z-50">
-              <div class="px-4 py-2 border-b border-current/10">
+            <div id="profileMenu" class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-2xl shadow-xl py-2 z-50 border border-gray-200 dark:border-gray-700">
+              <div class="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
                 <p class="text-sm font-medium text-gray-800 dark:text-white"><?php echo e(current_username()); ?></p>
               </div>
               <a href="<?php echo e($base); ?>/profile.php" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition">
