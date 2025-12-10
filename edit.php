@@ -19,6 +19,15 @@ $mstmt = $pdo->prepare('SELECT * FROM media WHERE entry_id = ? ORDER BY media_id
 $mstmt->execute([$entryId]);
 $media = $mstmt->fetchAll();
 
+// Get categories
+$categories = get_categories($pdo);
+
+// Get existing tags for this entry
+$tagsStmt = $pdo->prepare('SELECT t.tag_name FROM tags t JOIN entry_tags et ON t.tag_id = et.tag_id WHERE et.entry_id = ?');
+$tagsStmt->execute([$entryId]);
+$existingTags = $tagsStmt->fetchAll(PDO::FETCH_COLUMN);
+$tagsString = implode(', ', $existingTags);
+
 $error = null;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $title = trim($_POST['title'] ?? '');
@@ -26,13 +35,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $mood = trim($_POST['mood'] ?? '');
   $musicLink = trim($_POST['music_link'] ?? '');
   $imageUrl = trim($_POST['image_url'] ?? '');
+  $categoryId = !empty($_POST['category_id']) ? (int)$_POST['category_id'] : null;
+  $location = trim($_POST['location'] ?? '');
+  $tagsInput = trim($_POST['tags'] ?? '');
+  $privacyLevel = $_POST['privacy_level'] ?? 'private';
   $toDelete = array_map('intval', $_POST['delete_media'] ?? []);
 
   if ($title === '' || $content === '') {
     $error = 'Title and content are required';
   } else {
-    $upd = $pdo->prepare('UPDATE entries SET title = ?, content = ?, mood = ?, music_link = ? WHERE entry_id = ? AND user_id = ?');
-    $upd->execute([$title, $content, $mood !== '' ? $mood : null, $musicLink !== '' ? $musicLink : null, $entryId, current_user_id()]);
+    $upd = $pdo->prepare('UPDATE entries SET title = ?, content = ?, mood = ?, music_link = ?, category_id = ?, location = ?, privacy_level = ? WHERE entry_id = ? AND user_id = ?');
+    $upd->execute([$title, $content, $mood !== '' ? $mood : null, $musicLink !== '' ? $musicLink : null, $categoryId, $location !== '' ? $location : null, $privacyLevel, $entryId, current_user_id()]);
+
+    // Update tags
+    // First, delete existing tags
+    $delTags = $pdo->prepare('DELETE FROM entry_tags WHERE entry_id = ?');
+    $delTags->execute([$entryId]);
+    
+    // Then add new tags
+    if ($tagsInput !== '') {
+      $tags = array_map('trim', explode(',', $tagsInput));
+      foreach ($tags as $tagName) {
+        if ($tagName === '') continue;
+        $stmt = $pdo->prepare('SELECT tag_id FROM tags WHERE tag_name = ?');
+        $stmt->execute([$tagName]);
+        $tag = $stmt->fetch();
+        if (!$tag) {
+          $ins = $pdo->prepare('INSERT INTO tags (tag_name) VALUES (?)');
+          $ins->execute([$tagName]);
+          $tagId = $pdo->lastInsertId();
+        } else {
+          $tagId = $tag['tag_id'];
+        }
+        $link = $pdo->prepare('INSERT INTO entry_tags (entry_id, tag_id) VALUES (?, ?)');
+        $link->execute([$entryId, $tagId]);
+      }
+    }
 
     // Delete selected media
     if (!empty($toDelete)) {
@@ -120,9 +158,42 @@ include __DIR__ . '/partials/head.php';
       </div>
 
       <div>
-        <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Music Link (YouTube/Spotify)</label>
-        <input type="url" name="music_link" value="<?php echo e($entry['music_link']); ?>" placeholder="https://youtube.com/... or https://open.spotify.com/..."
-               class="w-full rounded-2xl px-4 py-3 bg-white/70 dark:bg-gray-700/50 focus:bg-white dark:focus:bg-gray-700 text-gray-900 dark:text-gray-100 outline-none border border-primary-100 dark:border-gray-600 focus:border-primary-400 dark:focus:border-primary-500 shadow-sm transition" />
+        <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Category (optional)</label>
+        <select name="category_id" class="w-full rounded-2xl px-4 py-3 bg-white/70 dark:bg-gray-700/50 focus:bg-white dark:focus:bg-gray-700 text-gray-900 dark:text-gray-100 outline-none border border-primary-100 dark:border-gray-600 shadow-sm transition">
+          <option value="">No Category</option>
+          <?php foreach ($categories as $cat): ?>
+            <option value="<?php echo $cat['category_id']; ?>" <?php echo $entry['category_id'] == $cat['category_id'] ? 'selected' : ''; ?>><?php echo e($cat['icon'] . ' ' . $cat['category_name']); ?></option>
+          <?php endforeach; ?>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Location (optional)</label>
+        <input name="location" value="<?php echo e($entry['location']); ?>" placeholder="e.g., Paris, France" class="w-full rounded-2xl px-4 py-3 bg-white/70 dark:bg-gray-700/50 focus:bg-white dark:focus:bg-gray-700 text-gray-900 dark:text-gray-100 outline-none border border-primary-100 dark:border-gray-600 focus:border-primary-400 dark:focus:border-primary-500 shadow-sm transition" />
+      </div>
+
+      <div>
+        <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Tags (comma-separated, optional)</label>
+        <input name="tags" value="<?php echo e($tagsString); ?>" placeholder="summer, travel, adventure" class="w-full rounded-2xl px-4 py-3 bg-white/70 dark:bg-gray-700/50 focus:bg-white dark:focus:bg-gray-700 text-gray-900 dark:text-gray-100 outline-none border border-primary-100 dark:border-gray-600 focus:border-primary-400 dark:focus:border-primary-500 shadow-sm transition" />
+      </div>
+
+      <div>
+        <label for="music_link" class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Music Link (YouTube/Spotify, optional)</label>
+        <input type="text" id="music_link" name="music_link" value="<?php echo e($entry['music_link'] ?? ''); ?>" placeholder="https://youtube.com/... or https://open.spotify.com/..." autocomplete="off"
+               class="w-full rounded-2xl px-4 py-3 bg-white/70 dark:bg-gray-700/50 focus:bg-white dark:focus:bg-gray-700 text-gray-900 dark:text-gray-100 outline-none border border-primary-100 dark:border-gray-600 focus:border-primary-400 dark:focus:border-primary-500 shadow-sm transition" style="pointer-events: auto !important;" />
+        <small class="text-xs text-gray-500 dark:text-gray-400 mt-1">Enter YouTube or Spotify URL</small>
+      </div>
+
+      <div>
+        <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Privacy</label>
+        <select name="privacy_level" class="w-full rounded-2xl px-4 py-3 bg-white/70 dark:bg-gray-700/50 focus:bg-white dark:focus:bg-gray-700 text-gray-900 dark:text-gray-100 outline-none border border-primary-100 dark:border-gray-600 shadow-sm transition">
+          <?php foreach (get_privacy_levels() as $value => $label): ?>
+            <option value="<?php echo e($value); ?>" <?php echo $entry['privacy_level'] === $value ? 'selected' : ''; ?>><?php echo e($label); ?></option>
+          <?php endforeach; ?>
+        </select>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+          <i class="fas fa-info-circle"></i> Public posts appear in the community feed
+        </p>
       </div>
 
       <?php if (!empty($media)): ?>

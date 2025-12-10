@@ -32,10 +32,10 @@ function current_username(): ?string {
 
 function login_user(string $username, string $password): bool {
     $pdo = get_pdo();
-    $stmt = $pdo->prepare('SELECT user_id, username, password_hash FROM users WHERE username = ?');
+    $stmt = $pdo->prepare('SELECT user_id, username, password FROM users WHERE username = ?');
     $stmt->execute([$username]);
     $user = $stmt->fetch();
-    if ($user && password_verify($password, $user['password_hash'])) {
+    if ($user && $password === $user['password']) {
         start_session_once();
         $_SESSION['user_id'] = (int)$user['user_id'];
         $_SESSION['username'] = $user['username'];
@@ -52,12 +52,11 @@ function register_user(string $username, string $password, string $security_ques
     if ($exists->fetchColumn()) {
         return [false, 'Username already taken'];
     }
-    $hash = password_hash($password, PASSWORD_DEFAULT);
-    $answer_hash = !empty($security_answer) ? password_hash(strtolower(trim($security_answer)), PASSWORD_DEFAULT) : null;
+    $answer = !empty($security_answer) ? strtolower(trim($security_answer)) : null;
     
-    $stmt = $pdo->prepare('INSERT INTO users (username, password_hash, security_question, security_answer) VALUES (?, ?, ?, ?)');
+    $stmt = $pdo->prepare('INSERT INTO users (username, password, security_question, security_answer) VALUES (?, ?, ?, ?)');
     try {
-        $stmt->execute([$username, $hash, $security_question, $answer_hash]);
+        $stmt->execute([$username, $password, $security_question, $answer]);
         return [true, null];
     } catch (Throwable $e) {
         return [false, 'Failed to create user'];
@@ -72,4 +71,72 @@ function logout_user(): void {
         setcookie(session_name(), '', time() - 42000, $params['path'], $params['domain'], $params['secure'], $params['httponly']);
     }
     session_destroy();
+}
+
+/**
+ * Get current user's full details
+ */
+function get_logged_in_user(): ?array {
+    if (!is_logged_in()) return null;
+    require_once __DIR__ . '/db.php';
+    return db_one("SELECT u.*, r.role_name 
+                   FROM users u 
+                   LEFT JOIN roles r ON u.role_id = r.role_id 
+                   WHERE u.user_id = ?", [current_user_id()]);
+}
+
+/**
+ * Check if current user has a specific permission
+ */
+function has_permission(string $permissionName): bool {
+    if (!is_logged_in()) return false;
+    require_once __DIR__ . '/utils.php';
+    return user_has_permission(current_user_id(), $permissionName);
+}
+
+/**
+ * Require a specific permission or redirect
+ */
+function require_permission(string $permissionName, string $message = 'You do not have permission to access this page'): void {
+    if (!has_permission($permissionName)) {
+        flash($message, 'error');
+        redirect('dashboard.php');
+    }
+}
+
+/**
+ * Check if current user is admin
+ */
+function is_admin(): bool {
+    $user = get_logged_in_user();
+    return $user && $user['role_name'] === 'Admin';
+}
+
+/**
+ * Require admin role
+ */
+function require_admin(): void {
+    if (!is_admin()) {
+        flash('Admin access required', 'error');
+        redirect('dashboard.php');
+    }
+}
+
+/**
+ * Update last login time
+ */
+function update_last_login(int $userId): void {
+    require_once __DIR__ . '/db.php';
+    db_exec("UPDATE users SET last_login = NOW() WHERE user_id = ?", [$userId]);
+}
+
+/**
+ * Log user session
+ */
+function log_user_session(int $userId): void {
+    require_once __DIR__ . '/db.php';
+    $ipAddress = $_SERVER['REMOTE_ADDR'] ?? null;
+    $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? null;
+    db_exec("INSERT INTO user_sessions (user_id, ip_address, user_agent) VALUES (?, ?, ?)",
+            [$userId, $ipAddress, $userAgent]);
 }
