@@ -225,11 +225,12 @@ a:hover {
 a {
   color: var(--primary-500);
   transition: all 0.3s ease;
+  text-decoration: none;
 }
 
 a:hover {
   color: var(--primary-700);
-  text-decoration: underline;
+  text-decoration: none;
 }
 nav a[href*="dashboard"] span {
   text-decoration: none !important;

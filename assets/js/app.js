@@ -43,10 +43,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (dropdownBtn && dropdownMenu) {
       dropdownBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        // Position the dropdown
+        // Position the dropdown aligned to the right edge of the button
         const rect = dropdownBtn.getBoundingClientRect();
-        dropdownMenu.style.top = (rect.bottom + 8) + 'px';
-        dropdownMenu.style.right = (window.innerWidth - rect.right) + 'px';
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        dropdownMenu.style.top = (rect.bottom + scrollTop + 4) + 'px';
+        dropdownMenu.style.left = (rect.right - 260) + 'px'; // Align right edge: button right - dropdown width (192px = w-48)
+        dropdownMenu.style.right = 'auto';
         dropdownMenu.classList.toggle('hidden');
       });
       
