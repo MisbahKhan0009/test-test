@@ -15,7 +15,6 @@ $base = rtrim(app_base_url(), '/');
             <i class="fas fa-palette"></i>
           </div>
         </div>
-        
         <!-- Fancy Logo Text -->
         <div class="flex flex-col leading-tight">
           <span class="font-display text-2xl font-black bg-gradient-to-r from-primary-600 via-primary-500 to-primary-700 bg-clip-text text-transparent group-hover:from-primary-700 group-hover:to-primary-600 transition no-underline">
@@ -28,14 +27,12 @@ $base = rtrim(app_base_url(), '/');
       </a>
       <div class="flex items-center gap-2 md:gap-4 flex-wrap justify-end">
         <?php if ($authed): ?>
-          <a href="<?php echo e($base); ?>/dashboard.php" class="px-4 py-2 rounded-full bg-white/70 hover:bg-white/90 text-gray-700 transition shadow-sm hover:shadow-md text-sm md:text-base">Dashboard</a>
-          
+          <a href="<?php echo e($base); ?>/dashboard.php" class="px-4 py-2 rounded-full bg-white/70 hover:bg-white/90 text-gray-700 transition shadow-sm hover:shadow-md text-sm md:text-base">Dashboard</a>  
           <!-- Profile Dropdown -->
           <div class="relative">
             <button id="profileDropdown" class="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center text-white font-bold shadow-md hover:shadow-lg transition text-lg" aria-label="Profile menu">
               <?php echo strtoupper(substr(current_username(), 0, 1)); ?>
             </button>
-            
             <!-- Dropdown Menu -->
             <div id="profileMenu" class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-2xl shadow-xl py-2 z-50 border border-gray-200 dark:border-gray-700">
               <div class="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
@@ -53,7 +50,6 @@ $base = rtrim(app_base_url(), '/');
           <a href="<?php echo e($base); ?>/index.php" class="px-4 py-2 rounded-full bg-white/70 hover:bg-white/90 text-gray-700 transition text-sm md:text-base">Login</a>
           <a href="<?php echo e($base); ?>/signup.php" class="px-4 py-2 rounded-full bg-primary-600 hover:bg-primary-700 text-white transition shadow-md hover:shadow-lg text-sm md:text-base font-medium">Sign Up</a>
         <?php endif; ?>
-        
         <button id="themeToggle" class="px-3 py-2 rounded-full bg-white/70 hover:bg-white/90 text-gray-700 dark:bg-gray-700/70 dark:text-gray-200 transition border border-primary-200 dark:border-gray-600 text-sm" aria-label="Switch theme" title="Toggle dark/light theme">
           <i class="fas fa-moon"></i>
         </button>
