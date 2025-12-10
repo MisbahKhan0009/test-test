@@ -53,8 +53,8 @@ $base = rtrim(app_base_url(), '/');
               <?php echo strtoupper(substr(current_username(), 0, 1)); ?>
             </button>
             <!-- Dropdown Menu -->
-            <div id="profileMenu" class=" glass hidden fixed w-48 rounded-2xl shadow-2xl py-2 border border-white/20" style="z-index: 9999; background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%);">
-              <div class="px-4 py-2 border-b border-white/20">
+            <div id="profileMenu" class="hidden fixed w-48 rounded-2xl shadow-2xl py-2" style="z-index: 9999; background: rgba(32, 45, 30, 0.51); backdrop-filter: blur(25px) saturate(180%); -webkit-backdrop-filter: blur(25px) saturate(180%); border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);">
+              <div class="px-4 py-2 border-b" style="border-color: rgba(255, 255, 255, 0.15);">
                 <p class="text-sm font-medium text-white"><?php echo e(current_username()); ?></p>
               </div>
               <a href="<?php echo e($base); ?>/profile.php" class="block px-4 py-2 text-sm text-gray-200 hover:bg-white/10 transition">
