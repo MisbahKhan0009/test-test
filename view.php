@@ -36,12 +36,12 @@ include __DIR__ . '/partials/head.php';
 
     <!-- MEDIA DISPLAY SECTION -->
     <?php if (!empty($media)): ?>
-      <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div class="mt-6 flex flex-col items-center gap-4">
         <?php foreach ($media as $m): ?>
           <?php if (strpos($m['file_type'], 'image/') === 0): ?>
-            <img src="<?php echo e($m['file_path']); ?>" class="w-full rounded-2xl shadow" />
+            <img src="<?php echo e($m['file_path']); ?>" class="max-w-2xl w-full rounded-2xl shadow-lg" />
           <?php elseif (strpos($m['file_type'], 'audio/') === 0): ?>
-            <div class="p-4 rounded-2xl bg-white/70 border border-primary-100 shadow">
+            <div class="max-w-2xl w-full p-4 rounded-2xl bg-white/70 dark:bg-gray-700/50 border border-primary-100 dark:border-gray-600 shadow">
               <audio controls class="w-full">
                 <source src="<?php echo e($m['file_path']); ?>" type="<?php echo e($m['file_type']); ?>" />
               </audio>
