@@ -38,6 +38,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   if ($title === '' || $content === '') {
     $error = 'Title and content are required';
   } else {
+    // Debug logging
+    error_log("[Create Entry] Processing entry creation");
+    error_log("[Create Entry] FILES: " . json_encode($_FILES));
+    error_log("[Create Entry] Image URL: " . $imageUrl);
+    
     try {
       $entryId = db_tx(function(PDO $pdo) use ($config, $title, $content, $mood, $timestamp, $musicLink, $imageUrl) {
 
@@ -68,12 +73,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $size = $_FILES['media']['size'][$idx];
             $err = $_FILES['media']['error'][$idx];
             if ($err === UPLOAD_ERR_NO_FILE) continue;
-            if ($err !== UPLOAD_ERR_OK) continue;
-            if (!is_uploaded_file($tmp)) continue;
-            if ($size > $max) continue;
+            if ($err !== UPLOAD_ERR_OK) {
+              error_log("[Upload] Error code for $name: $err");
+              continue;
+            }
+            if (!is_uploaded_file($tmp)) {
+              error_log("[Upload] Not an uploaded file: $tmp");
+              continue;
+            }
+            if ($size > $max) {
+              error_log("[Upload] File too large: $size > $max");
+              continue;
+            }
 
             $type = @mime_content_type($tmp) ?: 'application/octet-stream';
-            if (!in_array($type, $allowed, true)) continue;
+            if (!in_array($type, $allowed, true)) {
+              error_log("[Upload] Mime type not allowed: $type");
+              continue;
+            }
 
             $ext = pathinfo($name, PATHINFO_EXTENSION);
             $safeName = uniqid('m_', true) . ($ext ? ('.' . strtolower($ext)) : '');
@@ -83,6 +100,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               $relPath = 'uploads/' . current_user_id() . '/' . $safeName;
               $ins = $pdo->prepare('INSERT INTO media (entry_id, file_path, file_type) VALUES (?, ?, ?)');
               $ins->execute([$entryId, $relPath, $type]);
+              error_log("[Upload] Successfully inserted media: $relPath");
+            } else {
+              error_log("[Upload] Failed to move file from $tmp to $destAbs");
             }
           }
         }
@@ -96,7 +116,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               $type = 'image/' . ($extension === 'jpg' ? 'jpeg' : $extension);
               $ins = $pdo->prepare('INSERT INTO media (entry_id, file_path, file_type) VALUES (?, ?, ?)');
               $ins->execute([$entryId, $imageUrl, $type]);
+              error_log("[Image URL] Successfully inserted: $imageUrl");
+            } else {
+              error_log("[Image URL] Invalid extension: $extension");
             }
+          } else {
+            error_log("[Image URL] Invalid URL: $imageUrl");
           }
         }
 
