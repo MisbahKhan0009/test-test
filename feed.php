@@ -75,7 +75,6 @@ $moods = allowed_moods();
 
 $pageTitle = 'Public Feed';
 include __DIR__ . '/partials/head.php';
-include __DIR__ . '/partials/nav.php';
 ?>
 
 <div class="container mx-auto px-4 py-8 max-w-5xl">
@@ -211,17 +210,11 @@ include __DIR__ . '/partials/nav.php';
                 <i class="<?php echo $e['user_reacted'] ? 'fas' : 'far'; ?> fa-heart"></i>
                 <span class="reaction-count"><?php echo $e['reaction_count'] ?: '0'; ?></span>
               </button>
-
-              <!-- Comment Count -->
-              <a href="<?php echo e(app_base_url()); ?>/view.php?id=<?php echo $e['entry_id']; ?>" class="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition">
-                <i class="far fa-comment"></i>
-                <span><?php echo $e['comment_count'] ?: '0'; ?></span>
-              </a>
             </div>
 
             <div class="flex items-center gap-2">
               <a href="<?php echo e(app_base_url()); ?>/view.php?id=<?php echo $e['entry_id']; ?>" class="px-4 py-2 rounded-full bg-primary-100 hover:bg-primary-200 dark:bg-primary-900/30 dark:hover:bg-primary-900/50 text-primary-700 dark:text-primary-300 font-medium transition text-sm">
-                <i class="fas fa-book-open mr-2"></i>Read More
+                <i class="fas fa-book-open mr-2"></i>Read Post
               </a>
               <?php if ($isOwnPost): ?>
                 <a href="<?php echo e(app_base_url()); ?>/edit.php?id=<?php echo $e['entry_id']; ?>" class="px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 font-medium transition text-sm">

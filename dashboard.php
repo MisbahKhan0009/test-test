@@ -96,18 +96,7 @@ include __DIR__ . '/partials/head.php';
 <div class="container mx-auto px-4 py-8 max-w-7xl">
   <!-- Page Header -->
   <div class="glass rounded-2xl shadow-xl p-6 mb-6">
-    <div class="flex items-center justify-between mb-4">
-      <div>
-        <h1 class="text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-3">
-          <i class="fas fa-book text-primary-600"></i>
-          My Posts
-        </h1>
-        <p class="text-gray-600 dark:text-gray-400 mt-1">Manage your personal diary entries</p>
-      </div>
-      <a href="<?php echo e(app_base_url()); ?>/create.php" class="px-6 py-3 rounded-full bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-medium shadow-lg hover:shadow-xl transition transform hover:scale-105">
-        <i class="fas fa-plus mr-2"></i>New Entry
-      </a>
-    </div>
+    
   
   <!-- Search and Filter Form -->
   <form method="get" class="space-y-4">

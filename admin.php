@@ -42,7 +42,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['toggle_active'])) {
 $roles = get_roles();
 
 include 'partials/head.php';
-include 'partials/nav.php';
 ?>
 
 <div class="min-h-screen bg-gray-900 py-8">

@@ -143,7 +143,7 @@ CREATE TABLE IF NOT EXISTS entries (
   music_link VARCHAR(500) NULL,
   location VARCHAR(100) NULL,
   weather VARCHAR(50) NULL,
-  privacy_level ENUM('private', 'friends', 'public') DEFAULT 'private',
+  privacy_level ENUM('private', 'public') DEFAULT 'private',
   is_favorite BOOLEAN DEFAULT FALSE,
   is_deleted BOOLEAN DEFAULT FALSE,
   version INT UNSIGNED DEFAULT 1,
@@ -417,7 +417,7 @@ INSERT INTO entries (user_id, category_id, title, content, mood, location, priva
 (1, 2, 'System Launch', 'Successfully launched the diary application. All features are working perfectly!', 'Excited', 'New York, USA', 'public', '2024-01-20 14:30:00'),
 
 -- John's entries
-(2, 3, 'Trip to Paris', 'Amazing day exploring the Eiffel Tower and trying authentic French cuisine. The city is magical!', 'Excited', 'Paris, France', 'friends', '2024-03-15 20:00:00'),
+(2, 3, 'Trip to Paris', 'Amazing day exploring the Eiffel Tower and trying authentic French cuisine. The city is magical!', 'Excited', 'Paris, France', 'public', '2024-03-15 20:00:00'),
 (2, 4, 'New Year Goals', 'Setting ambitious goals for 2024: Read 50 books, learn Spanish, and run a marathon. Let''s do this!', 'Reflective', 'Boston, USA', 'private', '2024-01-01 09:00:00'),
 (2, 1, 'Sunday Thoughts', 'Spent the day reflecting on life and relationships. Feeling grateful for family and friends.', 'Calm', 'Boston, USA', 'private', '2024-02-25 16:00:00'),
 
@@ -428,7 +428,7 @@ INSERT INTO entries (user_id, category_id, title, content, mood, location, priva
 
 -- Alice's entries
 (4, 1, 'Childhood Memories', 'Found old photo albums today. So many wonderful memories flooding back!', 'Reflective', 'Seattle, USA', 'private', '2024-05-01 14:00:00'),
-(4, 3, 'Beach Weekend', 'Perfect beach day with friends. Sun, sand, and laughter - what more could I ask for?', 'Happy', 'Santa Monica, USA', 'friends', '2024-05-15 18:00:00'),
+(4, 3, 'Beach Weekend', 'Perfect beach day with friends. Sun, sand, and laughter - what more could I ask for?', 'Happy', 'Santa Monica, USA', 'public', '2024-05-15 18:00:00'),
 
 -- Bob's entries
 (5, 2, 'Career Milestone', 'Got promoted today! All the hard work has paid off. Celebrating with the team tonight.', 'Excited', 'Chicago, USA', 'public', '2024-06-01 17:00:00'),

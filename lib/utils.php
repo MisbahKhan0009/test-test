@@ -91,6 +91,14 @@ function mood_emoji(?string $mood): string {
     return $map[$mood] ?? '';
 }
 
+function excerpt(string $text, int $length = 150): string {
+    $text = strip_tags($text);
+    if (mb_strlen($text) <= $length) {
+        return $text;
+    }
+    return mb_substr($text, 0, $length) . '...';
+}
+
 // ==========================================
 // DATABASE UTILITY FUNCTIONS
 // ==========================================
@@ -291,7 +299,6 @@ function update_user_stats(int $userId): void {
 function get_privacy_levels(): array {
     return [
         'private' => 'Private (Only me)',
-        'friends' => 'Friends (Shared users)',
         'public' => 'Public (Everyone)'
     ];
 }

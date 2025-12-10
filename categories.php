@@ -48,7 +48,6 @@ $categories = db_all("SELECT c.*,
 $popular_tags = db_all("SELECT * FROM v_popular_tags LIMIT 20");
 
 include 'partials/head.php';
-include 'partials/nav.php';
 ?>
 
 <div class="min-h-screen bg-gray-900 py-8">
