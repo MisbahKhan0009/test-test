@@ -26,13 +26,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $mood = trim($_POST['mood'] ?? '');
   $musicLink = trim($_POST['music_link'] ?? '');
   $imageUrl = trim($_POST['image_url'] ?? '');
+  $privacyLevel = $_POST['privacy_level'] ?? 'private';
   $toDelete = array_map('intval', $_POST['delete_media'] ?? []);
 
   if ($title === '' || $content === '') {
     $error = 'Title and content are required';
   } else {
-    $upd = $pdo->prepare('UPDATE entries SET title = ?, content = ?, mood = ?, music_link = ? WHERE entry_id = ? AND user_id = ?');
-    $upd->execute([$title, $content, $mood !== '' ? $mood : null, $musicLink !== '' ? $musicLink : null, $entryId, current_user_id()]);
+    $upd = $pdo->prepare('UPDATE entries SET title = ?, content = ?, mood = ?, music_link = ?, privacy_level = ? WHERE entry_id = ? AND user_id = ?');
+    $upd->execute([$title, $content, $mood !== '' ? $mood : null, $musicLink !== '' ? $musicLink : null, $privacyLevel, $entryId, current_user_id()]);
 
     // Delete selected media
     if (!empty($toDelete)) {
@@ -123,6 +124,18 @@ include __DIR__ . '/partials/head.php';
         <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Music Link (YouTube/Spotify)</label>
         <input type="url" name="music_link" value="<?php echo e($entry['music_link']); ?>" placeholder="https://youtube.com/... or https://open.spotify.com/..."
                class="w-full rounded-2xl px-4 py-3 bg-white/70 dark:bg-gray-700/50 focus:bg-white dark:focus:bg-gray-700 text-gray-900 dark:text-gray-100 outline-none border border-primary-100 dark:border-gray-600 focus:border-primary-400 dark:focus:border-primary-500 shadow-sm transition" />
+      </div>
+
+      <div>
+        <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Privacy</label>
+        <select name="privacy_level" class="w-full rounded-2xl px-4 py-3 bg-white/70 dark:bg-gray-700/50 focus:bg-white dark:focus:bg-gray-700 text-gray-900 dark:text-gray-100 outline-none border border-primary-100 dark:border-gray-600 shadow-sm transition">
+          <?php foreach (get_privacy_levels() as $value => $label): ?>
+            <option value="<?php echo e($value); ?>" <?php echo $entry['privacy_level'] === $value ? 'selected' : ''; ?>><?php echo e($label); ?></option>
+          <?php endforeach; ?>
+        </select>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+          <i class="fas fa-info-circle"></i> Public posts appear in the community feed
+        </p>
       </div>
 
       <?php if (!empty($media)): ?>

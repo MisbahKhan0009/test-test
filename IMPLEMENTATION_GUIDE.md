@@ -71,7 +71,7 @@ Your Personal Diary application has been upgraded to a complex, production-ready
 
 #### Enhanced Authentication (`lib/auth.php`):
 ```php
-- get_current_user() // Full user details with role
+- get_logged_in_user() // Full user details with role
 - has_permission($permissionName)
 - require_permission()
 - is_admin()

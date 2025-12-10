@@ -89,17 +89,28 @@ $orderBy";
 
 $entries = db_all($sql, $params);
 
-$pageTitle = 'Dashboard';
+$pageTitle = 'My Posts';
 include __DIR__ . '/partials/head.php';
 ?>
-<div class="mb-6">
-  <!-- <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mb-4">
-    <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100">Your Entries</h1>
-    <a href="create.php" class="px-5 py-3 rounded-2xl bg-primary-600 hover:bg-primary-700 text-white shadow-lg transition">+ New Entry</a>
-  </div> -->
+
+<div class="container mx-auto px-4 py-8 max-w-7xl">
+  <!-- Page Header -->
+  <div class="glass rounded-2xl shadow-xl p-6 mb-6">
+    <div class="flex items-center justify-between mb-4">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-3">
+          <i class="fas fa-book text-primary-600"></i>
+          My Posts
+        </h1>
+        <p class="text-gray-600 dark:text-gray-400 mt-1">Manage your personal diary entries</p>
+      </div>
+      <a href="<?php echo e(app_base_url()); ?>/create.php" class="px-6 py-3 rounded-full bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-medium shadow-lg hover:shadow-xl transition transform hover:scale-105">
+        <i class="fas fa-plus mr-2"></i>New Entry
+      </a>
+    </div>
   
   <!-- Search and Filter Form -->
-  <form method="get" class="glass rounded-3xl p-5 shadow-lg">
+  <form method="get" class="space-y-4">
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       
       <!-- Search Box -->
@@ -172,18 +183,20 @@ include __DIR__ . '/partials/head.php';
       </button>
     </div>
   </form>
+  </div>
   
   <!-- Results Count -->
   <?php if ($searchQuery !== '' || $moodFilter !== '' || $dateFilter !== ''): ?>
-    <div class="mt-4 text-sm text-gray-600 dark:text-gray-400">
-      Found <?php echo count($entries); ?> 
-      <?php echo count($entries) === 1 ? 'entry' : 'entries'; ?>
-      <?php if ($searchQuery !== ''): ?>
-        matching "<strong><?php echo e($searchQuery); ?></strong>"
-      <?php endif; ?>
+    <div class="glass rounded-xl p-4 mb-6">
+      <p class="text-sm text-gray-600 dark:text-gray-400">
+        Found <strong><?php echo count($entries); ?></strong> 
+        <?php echo count($entries) === 1 ? 'entry' : 'entries'; ?>
+        <?php if ($searchQuery !== ''): ?>
+          matching "<strong><?php echo e($searchQuery); ?></strong>"
+        <?php endif; ?>
+      </p>
     </div>
   <?php endif; ?>
-</div>
 
 <div class="flex items-center justify-between mb-6">
   <h1 class="text-3xl font-bold text-gray-800">Your Entries</h1>
@@ -245,5 +258,6 @@ include __DIR__ . '/partials/head.php';
     <?php endforeach; ?>
   </div>
 <?php endif; ?>
+</div>
 
 <?php include __DIR__ . '/partials/footer.php'; ?>

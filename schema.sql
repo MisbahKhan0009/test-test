@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS users (
   date_of_birth DATE NULL,
   profile_pic VARCHAR(255) NULL,
   bio TEXT NULL,
-  password_hash VARCHAR(255) NOT NULL,
+  password VARCHAR(255) NOT NULL,
   security_question VARCHAR(255) NULL,
   security_answer VARCHAR(255) NULL,
   role_id INT UNSIGNED DEFAULT 3,
@@ -358,56 +358,56 @@ CREATE INDEX idx_sessions_user ON user_sessions(user_id);
 -- Password for all users: "password123"
 -- Security answer for all users: "blue"
 
-INSERT INTO users (username, full_name, email, password_hash, security_question, security_answer, role_id, is_active, created_at) VALUES
+INSERT INTO users (username, full_name, email, password, security_question, security_answer, role_id, is_active, created_at) VALUES
 -- Admin User
 ('admin', 'Admin User', 'admin@diary.com', 
- '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 
+ 'password123', 
  'What is your favorite color?', 
- '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 
+ 'blue', 
  1, TRUE, '2024-01-15 10:00:00'),
 
 -- Premium Users
 ('john_doe', 'John Doe', 'john@example.com', 
- '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 
+ 'password123', 
  'What is your favorite color?', 
- '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 
+ 'blue', 
  2, TRUE, '2024-02-20 14:30:00'),
 
 ('jane_smith', 'Jane Smith', 'jane@example.com', 
- '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 
+ 'password123', 
  'What is your favorite color?', 
- '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 
+ 'blue', 
  2, TRUE, '2024-03-10 09:15:00'),
 
 -- Regular Users
 ('alice_wonder', 'Alice Wonder', 'alice@example.com', 
- '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 
+ 'password123', 
  'What is your favorite color?', 
- '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 
+ 'blue', 
  3, TRUE, '2024-04-05 16:45:00'),
 
 ('bob_builder', 'Bob Builder', 'bob@example.com', 
- '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 
+ 'password123', 
  'What is your favorite color?', 
- '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 
+ 'blue', 
  3, TRUE, '2024-05-12 11:20:00'),
 
 ('charlie_brown', 'Charlie Brown', 'charlie@example.com', 
- '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 
+ 'password123', 
  'What is your favorite color?', 
- '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 
+ 'blue', 
  3, TRUE, '2024-06-18 08:00:00'),
 
 ('diana_prince', 'Diana Prince', 'diana@example.com', 
- '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 
+ 'password123', 
  'What is your favorite color?', 
- '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 
+ 'blue', 
  3, TRUE, '2024-07-22 13:30:00'),
 
 ('emma_watson', 'Emma Watson', 'emma@example.com', 
- '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 
+ 'password123', 
  'What is your favorite color?', 
- '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 
+ 'blue', 
  3, TRUE, '2024-08-14 10:45:00');
 
 -- Insert sample diary entries for demonstration

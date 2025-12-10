@@ -207,6 +207,9 @@ include __DIR__ . '/partials/head.php';
               <option value="<?php echo e($value); ?>" <?php echo $value === 'private' ? 'selected' : ''; ?>><?php echo e($label); ?></option>
             <?php endforeach; ?>
           </select>
+          <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            <i class="fas fa-globe"></i> Public posts will appear in the community feed
+          </p>
         </div>
       </div>
 
