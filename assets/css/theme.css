@@ -159,6 +159,22 @@ input, textarea, select {
   border-radius: 0.5rem;
 }
 
+/* Select dropdown options */
+select option {
+  background: var(--bg-1);
+  color: var(--text);
+}
+
+[data-theme="dark"] select {
+  background-color: rgba(67, 76, 94, 0.5) !important;
+  color: #E5E9F0 !important;
+}
+
+[data-theme="dark"] select option {
+  background-color: #3B4252 !important;
+  color: #E5E9F0 !important;
+}
+
 input::placeholder, textarea::placeholder {
   color: var(--muted);
 }
