@@ -46,11 +46,12 @@ include __DIR__ . '/partials/head.php';
             required 
             class="w-full rounded-2xl px-4 py-3 bg-white/70 focus:bg-white outline-none border border-primary-100 focus:border-primary-400 shadow-sm transition"
           />
-          <span 
+          <button 
+            type="button"
             onclick="togglePassword('password')" 
-            class="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500 text-xl">
-            👀
-          </span>
+            class="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition">
+            <i class="fas fa-eye" id="password-toggle-icon"></i>
+          </button>
         </div>
       </div>
       <p class="text-sm text-gray-600 mt-2">
@@ -65,7 +66,16 @@ include __DIR__ . '/partials/head.php';
 <script>
 function togglePassword(id) {
   const input = document.getElementById(id);
-  input.type = input.type === "password" ? "text" : "password";
+  const icon = document.getElementById(id + '-toggle-icon');
+  if (input.type === "password") {
+    input.type = "text";
+    icon.classList.remove('fa-eye');
+    icon.classList.add('fa-eye-slash');
+  } else {
+    input.type = "password";
+    icon.classList.remove('fa-eye-slash');
+    icon.classList.add('fa-eye');
+  }
 }
 </script>
 

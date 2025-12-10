@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const updateIcon = () => {
         const icon = btn.querySelector('span');
         if (icon) {
-          icon.textContent = theme === 'dark' ? '☀️' : '🌙';
+          icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
         }
         btn.setAttribute('aria-label', `Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`);
       };

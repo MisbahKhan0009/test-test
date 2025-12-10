@@ -7,7 +7,7 @@
         <!-- Brand -->
         <div>
           <div class="flex items-center gap-2 mb-3">
-            <div class="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-700 rounded-lg flex items-center justify-center text-white text-lg">🎨</div>
+            <div class="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-700 rounded-lg flex items-center justify-center text-white text-lg"><i class="fas fa-palette"></i></div>
             <h3 class="font-display text-lg font-bold bg-gradient-to-r from-primary-600 to-primary-700 bg-clip-text text-transparent">Life Canvas</h3>
           </div>
           <p class="text-sm text-gray-600 dark:text-gray-400">
@@ -58,7 +58,7 @@
       <div class="border-t border-current/10 pt-8 mt-8">
         <div class="flex flex-col md:flex-row items-center justify-between text-sm text-gray-600 dark:text-gray-400">
           <p>&copy; 2025 Life Canvas. All rights reserved.</p>
-          <p>Crafted with 🎨 for your creative expression</p>
+          <p>Crafted with <i class="fas fa-palette text-primary-500"></i> for your creative expression</p>
         </div>
       </div>
     </div>

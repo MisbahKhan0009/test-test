@@ -12,7 +12,7 @@ $base = rtrim(app_base_url(), '/');
         <!-- Logo Icon with gradient and artistic elements -->
         <div class="relative w-12 h-12 flex items-center justify-center">
           <div class="relative bg-gradient-to-br from-primary-500 to-primary-700 rounded-lg w-10 h-10 flex items-center justify-center text-white text-xl font-bold shadow-lg">
-            🎨
+            <i class="fas fa-palette"></i>
           </div>
         </div>
         
@@ -54,8 +54,8 @@ $base = rtrim(app_base_url(), '/');
           <a href="<?php echo e($base); ?>/signup.php" class="px-4 py-2 rounded-full bg-primary-600 hover:bg-primary-700 text-white transition shadow-md hover:shadow-lg text-sm md:text-base font-medium">Sign Up</a>
         <?php endif; ?>
         
-        <button id="themeToggle" class="px-3 py-2 rounded-full bg-white/70 hover:bg-white/90 text-gray-700 transition border border-primary-200 text-sm" aria-label="Switch theme" title="Toggle dark/light theme">
-          <span class="inline-block">🌙</span>
+        <button id="themeToggle" class="px-3 py-2 rounded-full bg-white/70 hover:bg-white/90 text-gray-700 dark:bg-gray-700/70 dark:text-gray-200 transition border border-primary-200 dark:border-gray-600 text-sm" aria-label="Switch theme" title="Toggle dark/light theme">
+          <i class="fas fa-moon"></i>
         </button>
       </div>
     </div>
