@@ -6,38 +6,150 @@ require_login();
 $pdo = db();
 $userId = current_user_id();
 
-// Optional date filter
+// Search and filter parameters
+$searchQuery = isset($_GET['search']) ? trim($_GET['search']) : '';
+$moodFilter = isset($_GET['mood']) ? trim($_GET['mood']) : '';
 $dateFilter = isset($_GET['date']) ? trim($_GET['date']) : '';
+$sortBy = isset($_GET['sort']) ? trim($_GET['sort']) : 'newest';
+
+// Build SQL query with dynamic conditions
 $params = [$userId];
-$whereDate = '';
+$conditions = [];
+$orderBy = 'ORDER BY e.timestamp DESC';
+
+// Search in title and content
+if ($searchQuery !== '') {
+  $conditions[] = '(e.title LIKE ? OR e.content LIKE ?)';
+  $searchPattern = '%' . $searchQuery . '%';
+  $params[] = $searchPattern;
+  $params[] = $searchPattern;
+}
+
+// Filter by mood
+if ($moodFilter !== '' && $moodFilter !== 'all') {
+  $conditions[] = 'e.mood = ?';
+  $params[] = $moodFilter;
+}
+
+// Filter by date
 if ($dateFilter !== '') {
   $dt = DateTime::createFromFormat('Y-m-d', $dateFilter);
   if ($dt !== false) {
-    $whereDate = ' AND DATE(e.timestamp) = ?';
+    $conditions[] = 'DATE(e.timestamp) = ?';
     $params[] = $dt->format('Y-m-d');
   }
 }
 
-$entries = db_all("SELECT e.*, (
+// Sort options
+switch ($sortBy) {
+  case 'oldest':
+    $orderBy = 'ORDER BY e.timestamp ASC';
+    break;
+  case 'title':
+    $orderBy = 'ORDER BY e.title ASC';
+    break;
+  case 'mood':
+    $orderBy = 'ORDER BY e.mood ASC, e.timestamp DESC';
+    break;
+  default:
+    $orderBy = 'ORDER BY e.timestamp DESC';
+}
+
+// Construct WHERE clause
+$whereClause = 'WHERE e.user_id = ?';
+if (!empty($conditions)) {
+  $whereClause .= ' AND ' . implode(' AND ', $conditions);
+}
+
+// Execute query
+$sql = "SELECT e.*, (
   SELECT m.file_path FROM media m WHERE m.entry_id = e.entry_id AND m.file_type LIKE 'image/%' ORDER BY m.media_id ASC LIMIT 1
 ) AS cover_image
 FROM entries e
-WHERE e.user_id = ?" . $whereDate . "
-ORDER BY e.timestamp DESC", $params);
+$whereClause
+$orderBy";
+
+$entries = db_all($sql, $params);
 
 $pageTitle = 'Dashboard';
 include __DIR__ . '/partials/head.php';
 ?>
+<div class="mb-6">
+  <!-- <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mb-4">
+    <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100">Your Entries</h1>
+    <a href="create.php" class="px-5 py-3 rounded-2xl bg-primary-600 hover:bg-primary-700 text-white shadow-lg transition">+ New Entry</a>
+  </div> -->
+  
+  <!-- Search and Filter Form -->
+  <form method="get" class="glass rounded-3xl p-5 shadow-lg">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      
+      <!-- Search Box -->
+      <div>
+        <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Search</label>
+        <input type="text" name="search" value="<?php echo e($searchQuery); ?>" 
+               placeholder="Search title or content..." 
+               class="w-full rounded-2xl px-4 py-2 bg-white/70 dark:bg-gray-700/50 text-gray-900 dark:text-gray-100 border border-primary-100 dark:border-gray-600 focus:border-primary-400 dark:focus:border-primary-500 outline-none shadow-sm transition" />
+      </div>
+
+      <!-- Mood Filter -->
+      <div>
+        <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Mood</label>
+        <select name="mood" class="w-full rounded-2xl px-4 py-2 bg-white/70 dark:bg-gray-700/50 text-gray-900 dark:text-gray-100 border border-primary-100 dark:border-gray-600 focus:border-primary-400 dark:focus:border-primary-500 outline-none shadow-sm transition">
+          <option value="all" <?php echo $moodFilter === 'all' || $moodFilter === '' ? 'selected' : ''; ?>>All Moods</option>
+          <?php foreach (allowed_moods() as $label => $emoji): ?>
+            <option value="<?php echo e($label); ?>" <?php echo $moodFilter === $label ? 'selected' : ''; ?>>
+              <?php echo e($emoji . ' ' . $label); ?>
+            </option>
+          <?php endforeach; ?>
+        </select>
+      </div>
+
+      <!-- Date Filter -->
+      <div>
+        <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Date</label>
+        <input type="date" name="date" value="<?php echo e($dateFilter); ?>" 
+               class="w-full rounded-2xl px-4 py-2 bg-white/70 dark:bg-gray-700/50 text-gray-900 dark:text-gray-100 border border-primary-100 dark:border-gray-600 focus:border-primary-400 dark:focus:border-primary-500 outline-none shadow-sm transition" />
+      </div>
+
+      <!-- Sort By -->
+      <div>
+        <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Sort By</label>
+        <select name="sort" class="w-full rounded-2xl px-4 py-2 bg-white/70 dark:bg-gray-700/50 text-gray-900 dark:text-gray-100 border border-primary-100 dark:border-gray-600 focus:border-primary-400 dark:focus:border-primary-500 outline-none shadow-sm transition">
+          <option value="newest" <?php echo $sortBy === 'newest' ? 'selected' : ''; ?>>Newest First</option>
+          <option value="oldest" <?php echo $sortBy === 'oldest' ? 'selected' : ''; ?>>Oldest First</option>
+          <option value="title" <?php echo $sortBy === 'title' ? 'selected' : ''; ?>>Title (A-Z)</option>
+          <option value="mood" <?php echo $sortBy === 'mood' ? 'selected' : ''; ?>>Mood</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="flex justify-end gap-3 mt-4">
+      <a href="dashboard.php" class="px-4 py-2 rounded-2xl bg-white/70 dark:bg-gray-700/50 hover:bg-white/90 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 border border-primary-100 dark:border-gray-600 shadow-sm transition">
+        Clear
+      </a>
+      <button type="submit" class="px-5 py-2 rounded-2xl bg-primary-600 hover:bg-primary-700 text-white shadow-lg transition">
+        <i class="fas fa-search mr-2"></i>Apply Filters
+      </button>
+    </div>
+  </form>
+  
+  <!-- Results Count -->
+  <?php if ($searchQuery !== '' || $moodFilter !== '' || $dateFilter !== ''): ?>
+    <div class="mt-4 text-sm text-gray-600 dark:text-gray-400">
+      Found <?php echo count($entries); ?> 
+      <?php echo count($entries) === 1 ? 'entry' : 'entries'; ?>
+      <?php if ($searchQuery !== ''): ?>
+        matching "<strong><?php echo e($searchQuery); ?></strong>"
+      <?php endif; ?>
+    </div>
+  <?php endif; ?>
+</div>
+
 <div class="flex items-center justify-between mb-6">
   <h1 class="text-3xl font-bold text-gray-800">Your Entries</h1>
   <div class="flex items-center gap-3">
-    <form method="get" class="hidden sm:flex items-center gap-2">
-      <input type="date" name="date" value="<?php echo e($dateFilter); ?>" class="rounded-2xl px-3 py-2 bg-white/70 border border-primary-100 focus:border-primary-400 outline-none" />
-      <button class="px-3 py-2 rounded-2xl bg-white/70 hover:bg-white/90 text-gray-700 border border-primary-100">Filter</button>
-      <?php if ($dateFilter !== ''): ?>
-        <a href="dashboard.php" class="px-3 py-2 rounded-2xl bg-white/70 hover:bg-white/90 text-gray-700 border border-primary-100">Clear</a>
-      <?php endif; ?>
-    </form>
+    
     <a href="create.php" class="px-5 py-3 rounded-2xl bg-primary-600 hover:bg-primary-700 text-white shadow-lg transition">+ New Entry</a>
   </div>
 </div>
@@ -57,18 +169,13 @@ include __DIR__ . '/partials/head.php';
           <?php endif; ?>
           <?php if ($e['cover_image']): ?>
             <img src="<?php echo e($e['cover_image']); ?>" alt="cover" class="w-full h-40 object-cover group-hover:scale-105 transition" />
-          <?php else: ?>
-            <div class="w-full h-40 bg-gradient-to-br from-primary-700 to-primary-600"></div>
           <?php endif; ?>
           <div class="p-5">
             <div class="flex items-center justify-between">
-              <h2 class="text-lg font-semibold text-gray-800 truncate"><?php echo e($e['title']); ?></h2>
-              <?php if (!empty($e['mood'])): ?>
-                <span class="text-xs px-2 py-1 rounded-full bg-white/70 text-gray-700 border border-primary-100"><?php echo e($e['mood']); ?></span>
-              <?php endif; ?>
+              <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 truncate"><?php echo e($e['title']); ?></h2>
             </div>
-            <p class="text-sm text-gray-600 mt-2 line-clamp-2"><?php echo e(mb_strimwidth($e['content'], 0, 120, '…')); ?></p>
-            <p class="text-xs text-gray-500 mt-3"><?php echo e(human_datetime($e['timestamp'])); ?></p>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-2 line-clamp-2"><?php echo e(mb_strimwidth($e['content'], 0, 120, '…')); ?></p>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-3"><?php echo e(human_datetime($e['timestamp'])); ?></p>
           </div>
         </div>
       </a>

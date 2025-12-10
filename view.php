@@ -52,13 +52,40 @@ include __DIR__ . '/partials/head.php';
 
     <!-- MUSIC LINK SECTION -->
     <?php if (!empty($entry['music_link'])): ?>
-      <div class="mt-6">
-        <a href="<?php echo e($entry['music_link']); ?>" target="_blank">
-          <button class="px-5 py-2 bg-green-600 text-white rounded-xl shadow hover:bg-green-700 transition">
-            ▶ Play Music
-          </button>
-        </a>
-      </div>
+      <?php
+        // Convert YouTube URL to embed format
+        $musicUrl = $entry['music_link'];
+        $videoId = '';
+        
+        // Handle different YouTube URL formats
+        if (preg_match('/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/', $musicUrl, $matches)) {
+          $videoId = $matches[1];
+        }
+      ?>
+      <?php if ($videoId): ?>
+        <div class="mt-6">
+          <div class="rounded-2xl overflow-hidden shadow-lg">
+            <iframe 
+              width="100%" 
+              height="400" 
+              src="https://www.youtube.com/embed/<?php echo e($videoId); ?>" 
+              title="Music Player" 
+              frameborder="0" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+              allowfullscreen
+              class="w-full"
+            ></iframe>
+          </div>
+        </div>
+      <?php else: ?>
+        <div class="mt-6">
+          <a href="<?php echo e($entry['music_link']); ?>" target="_blank" rel="noopener noreferrer">
+            <button class="px-5 py-2 bg-green-600 text-white rounded-xl shadow hover:bg-green-700 transition flex items-center gap-2">
+              <i class="fas fa-music"></i> Play Music
+            </button>
+          </a>
+        </div>
+      <?php endif; ?>
     <?php endif; ?>
 
     <div class="prose max-w-none mt-6">
