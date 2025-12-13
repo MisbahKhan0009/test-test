@@ -300,11 +300,11 @@ ORDER BY t.usage_count DESC;
 -- 10. SAMPLE DATA
 -- ======================
 
--- Insert sample users
+-- Insert sample users (only Admin and User roles)
 INSERT INTO users (username, full_name, email, password, security_question, security_answer, user_role, is_active, created_at) VALUES
 ('admin', 'Admin User', 'admin@diary.com', 'password123', 'What is your favorite color?', 'blue', 'Admin', TRUE, '2024-01-15 10:00:00'),
-('john_doe', 'John Doe', 'john@example.com', 'password123', 'What is your favorite color?', 'blue', 'Premium', TRUE, '2024-02-20 14:30:00'),
-('jane_smith', 'Jane Smith', 'jane@example.com', 'password123', 'What is your favorite color?', 'blue', 'Premium', TRUE, '2024-03-10 09:15:00'),
+('john_doe', 'John Doe', 'john@example.com', 'password123', 'What is your favorite color?', 'blue', 'User', TRUE, '2024-02-20 14:30:00'),
+('jane_smith', 'Jane Smith', 'jane@example.com', 'password123', 'What is your favorite color?', 'blue', 'User', TRUE, '2024-03-10 09:15:00'),
 ('alice_wonder', 'Alice Wonder', 'alice@example.com', 'password123', 'What is your favorite color?', 'blue', 'User', TRUE, '2024-04-05 16:45:00'),
 ('bob_builder', 'Bob Builder', 'bob@example.com', 'password123', 'What is your favorite color?', 'blue', 'User', TRUE, '2024-05-12 11:20:00'),
 ('charlie_brown', 'Charlie Brown', 'charlie@example.com', 'password123', 'What is your favorite color?', 'blue', 'User', TRUE, '2024-06-18 08:00:00'),

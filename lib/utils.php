@@ -186,6 +186,7 @@ function remove_entry_tags(int $entryId): void {
 
 /**
  * Check if user has permission (simplified - based on user_role)
+ * Only two roles: Admin and User
  */
 function user_has_permission(int $userId, string $permissionName): bool {
     require_once __DIR__ . '/db.php';
@@ -198,15 +199,9 @@ function user_has_permission(int $userId, string $permissionName): bool {
     // Admin has all permissions
     if ($role === 'Admin') return true;
     
-    // Premium users have most permissions
-    if ($role === 'Premium') {
-        $premiumPerms = ['create_entry', 'edit_entry', 'delete_entry', 'view_entry', 
-                        'share_entry', 'comment_entry', 'view_analytics', 'export_data'];
-        return in_array($permissionName, $premiumPerms);
-    }
-    
     // Regular users have basic permissions
-    $basicPerms = ['create_entry', 'edit_entry', 'delete_entry', 'view_entry'];
+    $basicPerms = ['create_entry', 'edit_entry', 'delete_entry', 'view_entry', 
+                  'share_entry', 'comment_entry', 'view_analytics', 'export_data'];
     return in_array($permissionName, $basicPerms);
 }
 

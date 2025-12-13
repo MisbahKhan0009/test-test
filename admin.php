@@ -37,10 +37,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['toggle_active'])) {
     redirect('admin.php');
 }
 
-// Get all roles for dropdown (simplified)
+// Get all roles for dropdown (simplified - Admin and User only)
 $roles = [
     ['role_name' => 'Admin'],
-    ['role_name' => 'Premium'],
     ['role_name' => 'User']
 ];
 

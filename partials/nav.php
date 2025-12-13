@@ -30,20 +30,14 @@ $base = rtrim(app_base_url(), '/');
           <a href="<?php echo e($base); ?>/dashboard.php" class="px-4 py-2 rounded-full bg-white/70 hover:bg-white/90 text-gray-700 dark:text-gray-200 dark:bg-gray-800/70 dark:hover:bg-gray-800 transition shadow-sm hover:shadow-md text-sm md:text-base">
             <i class="fas fa-home mr-1"></i>My Posts
           </a>
-          <?php if (is_admin()): ?>
-          <a href="<?php echo e($base); ?>/categories.php" class="px-4 py-2 rounded-full bg-white/70 hover:bg-white/90 text-gray-700 dark:text-gray-200 dark:bg-gray-800/70 dark:hover:bg-gray-800 transition shadow-sm hover:shadow-md text-sm md:text-base">
-            <i class="fas fa-tags mr-1"></i>Categories
-          </a>
-          <?php else: ?>
           <a href="<?php echo e($base); ?>/feed.php" class="px-4 py-2 rounded-full bg-white/70 hover:bg-white/90 text-gray-700 dark:text-gray-200 dark:bg-gray-800/70 dark:hover:bg-gray-800 transition shadow-sm hover:shadow-md text-sm md:text-base">
             <i class="fas fa-globe mr-1"></i>Feed
           </a>
-          <?php endif; ?>
           <a href="<?php echo e($base); ?>/analytics.php" class="px-4 py-2 rounded-full bg-white/70 hover:bg-white/90 text-gray-700 dark:text-gray-200 dark:bg-gray-800/70 dark:hover:bg-gray-800 transition shadow-sm hover:shadow-md text-sm md:text-base">
             <i class="fas fa-chart-line mr-1"></i>Analytics
           </a>
           <?php if (is_admin()): ?>
-          <a href="<?php echo e($base); ?>/admin.php" class="px-4 py-2 rounded-full bg-red-500/20 hover:bg-red-500/30 text-red-700 dark:text-red-300 transition shadow-sm hover:shadow-md text-sm md:text-base">
+          <a href="<?php echo e($base); ?>/admin.php" class="px-4 py-2 rounded-full bg-red-500/50 hover:bg-red-500/70 text-white-700 hover:text-white-700 transition shadow-sm hover:shadow-md text-sm md:text-base">
             <i class="fas fa-shield-alt mr-1"></i>Admin
           </a>
           <?php endif; ?>

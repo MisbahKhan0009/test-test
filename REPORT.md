@@ -12,9 +12,9 @@
 
 ## Executive Summary
 
-Life Canvas is a comprehensive personal diary application designed to demonstrate advanced database management concepts in a real-world web application context. The project showcases sophisticated database architecture with 20 normalized tables, 5 views, 6 stored procedures, 10 triggers, 3 custom functions, and over 30 optimized indexes. The application implements role-based access control, social networking features, analytics dashboards, and a modern glass morphism user interface.
+Life Canvas is a comprehensive personal diary application designed to demonstrate advanced database management concepts in a real-world web application context. The project features a simplified yet robust database architecture that covers all essential SQL topics including table management, data manipulation, queries, joins, aggregation, and views. The application implements role-based access control with two user types (Admin and User), social networking features, analytics dashboards, and a modern glass morphism user interface.
 
-The system supports multiple user roles (Admin, Premium, Regular), implements complex relationships through junction tables, maintains data integrity through foreign key constraints and triggers, and provides comprehensive audit logging for all critical operations.
+The system supports multiple user roles, implements relationships through foreign keys and junction tables, maintains data integrity through constraints, and provides comprehensive analytics using aggregate functions and GROUP BY operations.
 
 ---
 
@@ -33,16 +33,14 @@ The database follows **Third Normal Form (3NF)** to eliminate data redundancy an
 
 #### **User Management Tables**
 
-**1. `roles`**
+**1. `roles` - REMOVED IN SIMPLIFIED VERSION**
 ```sql
-- role_id (PK, AUTO_INCREMENT)
-- role_name (UNIQUE)
-- description
-- created_at (TIMESTAMP)
+-- Role information now stored directly in users table as VARCHAR
+-- user_role: 'Admin' or 'User'
 ```
-**Purpose:** Defines user role types (Admin, Premium, User)  
-**Records:** 3 default roles  
-**DBMS Concepts:** Primary key, unique constraint, default timestamp
+**Purpose:** Simplified role management using ENUM-like VARCHAR column  
+**Values:** 'Admin', 'User'  
+**DBMS Concepts:** VARCHAR data type, simple role-based access control
 
 **2. `users`**
 ```sql
