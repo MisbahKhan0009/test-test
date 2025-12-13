@@ -15,17 +15,16 @@ $total_categories = db_one("SELECT COUNT(*) as count FROM categories")['count'];
 $total_tags = db_one("SELECT COUNT(*) as count FROM tags")['count'];
 
 // Get recent users
-$recent_users = db_all("SELECT u.user_id, u.username, u.full_name, u.email, r.role_name, u.created_at, u.is_active
+$recent_users = db_all("SELECT u.user_id, u.username, u.full_name, u.email, u.user_role, u.created_at, u.is_active
                         FROM users u
-                        LEFT JOIN roles r ON u.role_id = r.role_id
                         ORDER BY u.created_at DESC
                         LIMIT 10");
 
 // Handle user role update
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_role'])) {
     $user_id = (int)$_POST['user_id'];
-    $role_id = (int)$_POST['role_id'];
-    db_exec("UPDATE users SET role_id = ? WHERE user_id = ?", [$role_id, $user_id]);
+    $user_role = $_POST['user_role']; // Now using VARCHAR
+    db_exec("UPDATE users SET user_role = ? WHERE user_id = ?", [$user_role, $user_id]);
     flash('User role updated successfully', 'success');
     redirect('admin.php');
 }
@@ -38,8 +37,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['toggle_active'])) {
     redirect('admin.php');
 }
 
-// Get all roles for dropdown
-$roles = get_roles();
+// Get all roles for dropdown (simplified)
+$roles = [
+    ['role_name' => 'Admin'],
+    ['role_name' => 'Premium'],
+    ['role_name' => 'User']
+];
 
 include 'partials/head.php';
 ?>
@@ -135,10 +138,10 @@ include 'partials/head.php';
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <form method="POST" class="inline">
                                     <input type="hidden" name="user_id" value="<?= $user['user_id'] ?>">
-                                    <select name="role_id" onchange="if(confirm('Change user role?')) this.form.submit()" 
+                                    <select name="user_role" onchange="if(confirm('Change user role?')) this.form.submit()" 
                                             class="bg-gray-700 text-white text-sm rounded px-2 py-1 border border-gray-600">
                                         <?php foreach ($roles as $role): ?>
-                                        <option value="<?= $role['role_id'] ?>" <?= $user['role_name'] === $role['role_name'] ? 'selected' : '' ?>>
+                                        <option value="<?= $role['role_name'] ?>" <?= $user['user_role'] === $role['role_name'] ? 'selected' : '' ?>>
                                             <?= e($role['role_name']) ?>
                                         </option>
                                         <?php endforeach; ?>

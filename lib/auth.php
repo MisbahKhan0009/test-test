@@ -79,10 +79,7 @@ function logout_user(): void {
 function get_logged_in_user(): ?array {
     if (!is_logged_in()) return null;
     require_once __DIR__ . '/db.php';
-    return db_one("SELECT u.*, r.role_name 
-                   FROM users u 
-                   LEFT JOIN roles r ON u.role_id = r.role_id 
-                   WHERE u.user_id = ?", [current_user_id()]);
+    return db_one("SELECT * FROM users WHERE user_id = ?", [current_user_id()]);
 }
 
 /**
@@ -109,7 +106,7 @@ function require_permission(string $permissionName, string $message = 'You do no
  */
 function is_admin(): bool {
     $user = get_logged_in_user();
-    return $user && $user['role_name'] === 'Admin';
+    return $user && $user['user_role'] === 'Admin';
 }
 
 /**
@@ -131,12 +128,9 @@ function update_last_login(int $userId): void {
 }
 
 /**
- * Log user session
+ * Log user session (simplified - removed for simpler schema)
  */
 function log_user_session(int $userId): void {
-    require_once __DIR__ . '/db.php';
-    $ipAddress = $_SERVER['REMOTE_ADDR'] ?? null;
-    $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? null;
-    db_exec("INSERT INTO user_sessions (user_id, ip_address, user_agent) VALUES (?, ?, ?)",
-            [$userId, $ipAddress, $userAgent]);
+    // Session logging removed in simplified version
+    return;
 }
