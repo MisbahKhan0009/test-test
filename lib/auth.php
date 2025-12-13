@@ -44,7 +44,7 @@ function login_user(string $username, string $password): bool {
     return false;
 }
 
-function register_user(string $username, string $password, string $security_question = '', string $security_answer = ''): array {
+function register_user(string $username, string $password, string $security_question = '', string $security_answer = '', string $email = ''): array {
     $pdo = get_pdo();
     // Ensure unique username
     $exists = $pdo->prepare('SELECT 1 FROM users WHERE username = ?');
@@ -52,11 +52,21 @@ function register_user(string $username, string $password, string $security_ques
     if ($exists->fetchColumn()) {
         return [false, 'Username already taken'];
     }
+    
+    // Check if email is already taken
+    if ($email !== '') {
+        $emailExists = $pdo->prepare('SELECT 1 FROM users WHERE email = ?');
+        $emailExists->execute([$email]);
+        if ($emailExists->fetchColumn()) {
+            return [false, 'Email already registered'];
+        }
+    }
+    
     $answer = !empty($security_answer) ? strtolower(trim($security_answer)) : null;
     
-    $stmt = $pdo->prepare('INSERT INTO users (username, password, security_question, security_answer) VALUES (?, ?, ?, ?)');
+    $stmt = $pdo->prepare('INSERT INTO users (username, email, password, security_question, security_answer) VALUES (?, ?, ?, ?, ?)');
     try {
-        $stmt->execute([$username, $password, $security_question, $answer]);
+        $stmt->execute([$username, $email !== '' ? $email : null, $password, $security_question, $answer]);
         return [true, null];
     } catch (Throwable $e) {
         return [false, 'Failed to create user'];
@@ -79,10 +89,7 @@ function logout_user(): void {
 function get_logged_in_user(): ?array {
     if (!is_logged_in()) return null;
     require_once __DIR__ . '/db.php';
-    return db_one("SELECT u.*, r.role_name 
-                   FROM users u 
-                   LEFT JOIN roles r ON u.role_id = r.role_id 
-                   WHERE u.user_id = ?", [current_user_id()]);
+    return db_one("SELECT * FROM users WHERE user_id = ?", [current_user_id()]);
 }
 
 /**
@@ -109,7 +116,7 @@ function require_permission(string $permissionName, string $message = 'You do no
  */
 function is_admin(): bool {
     $user = get_logged_in_user();
-    return $user && $user['role_name'] === 'Admin';
+    return $user && $user['user_role'] === 'Admin';
 }
 
 /**
@@ -131,12 +138,9 @@ function update_last_login(int $userId): void {
 }
 
 /**
- * Log user session
+ * Log user session (simplified - removed for simpler schema)
  */
 function log_user_session(int $userId): void {
-    require_once __DIR__ . '/db.php';
-    $ipAddress = $_SERVER['REMOTE_ADDR'] ?? null;
-    $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? null;
-    db_exec("INSERT INTO user_sessions (user_id, ip_address, user_agent) VALUES (?, ?, ?)",
-            [$userId, $ipAddress, $userAgent]);
+    // Session logging removed in simplified version
+    return;
 }

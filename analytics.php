@@ -8,18 +8,51 @@ require_login();
 $page_title = 'Analytics Dashboard';
 $user_id = current_user_id();
 
-// Get or update user stats
-$stats = get_user_stats($user_id);
-if (!$stats) {
-    update_user_stats($user_id);
-    $stats = get_user_stats($user_id);
-}
+// Calculate stats directly from entries table
+$stats = db_one("SELECT 
+    COUNT(*) AS total_entries,
+    COALESCE(SUM(word_count), 0) AS total_words,
+    COALESCE(AVG(word_count), 0) AS avg_words_per_entry,
+    MAX(DATE(timestamp)) AS last_entry_date
+FROM entries
+WHERE user_id = ? AND is_deleted = FALSE", [$user_id]);
 
-// Get mood distribution for last 30 days
-$mood_data = db_all("CALL sp_get_mood_distribution(?, DATE_SUB(CURDATE(), INTERVAL 30 DAY), CURDATE())", [$user_id]);
+// Find most common mood
+$mood = db_one("SELECT mood
+    FROM entries
+    WHERE user_id = ? AND is_deleted = FALSE AND mood IS NOT NULL
+    GROUP BY mood
+    ORDER BY COUNT(*) DESC
+    LIMIT 1", [$user_id]);
+$stats['most_common_mood'] = $mood ? $mood['mood'] : null;
 
-// Get writing calendar for current year
-$calendar_data = db_all("CALL sp_get_writing_calendar(?, YEAR(CURDATE()))", [$user_id]);
+// Calculate streaks
+$streak = calculate_writing_streak($user_id);
+$stats['current_streak'] = $streak['current'];
+$stats['longest_streak'] = $streak['longest'];
+
+// Get mood distribution for last 30 days using basic SQL
+$mood_data = db_all("SELECT mood, COUNT(*) AS entry_count,
+                          ROUND(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER(), 2) AS percentage
+                          FROM entries
+                          WHERE user_id = ? 
+                            AND is_deleted = FALSE
+                            AND mood IS NOT NULL
+                            AND DATE(timestamp) BETWEEN DATE_SUB(CURDATE(), INTERVAL 30 DAY) AND CURDATE()
+                          GROUP BY mood
+                          ORDER BY entry_count DESC", [$user_id]);
+
+// Get writing calendar for current year using basic SQL
+$calendar_data = db_all("SELECT DATE(timestamp) AS entry_date,
+                          COUNT(*) AS entry_count,
+                          SUM(word_count) AS total_words,
+                          GROUP_CONCAT(DISTINCT mood ORDER BY mood SEPARATOR ', ') AS moods
+                          FROM entries
+                          WHERE user_id = ?
+                            AND YEAR(timestamp) = YEAR(CURDATE())
+                            AND is_deleted = FALSE
+                          GROUP BY DATE(timestamp)
+                          ORDER BY entry_date", [$user_id]);
 
 // Get category breakdown
 $category_stats = db_all("SELECT c.category_name, c.color, c.icon, COUNT(e.entry_id) as count

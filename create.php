@@ -50,10 +50,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
       $entryId = db_tx(function(PDO $pdo) use ($config, $title, $content, $mood, $timestamp, $musicLink, $imageUrl, $categoryId, $tagsInput, $location, $privacyLevel) {
 
+        // Calculate word count manually (replaces trigger)
+        $wordCount = calculate_word_count($content);
+        
         // INSERT ENTRY
         $stmt = $pdo->prepare('
-          INSERT INTO entries (user_id, title, content, mood, timestamp, music_link, category_id, location, privacy_level)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+          INSERT INTO entries (user_id, title, content, mood, timestamp, music_link, category_id, location, privacy_level, word_count)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ');
         $stmt->execute([
           current_user_id(),
@@ -64,10 +67,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           $musicLink !== '' ? $musicLink : null,
           $categoryId,
           $location !== '' ? $location : null,
-          $privacyLevel
+          $privacyLevel,
+          $wordCount
         ]);
 
         $entryId = (int)$pdo->lastInsertId();
+        
+        // Initialize entry stats (replaces trigger)
+        init_entry_stats($entryId);
+        
+        // Update mood history (replaces trigger)
+        if ($mood !== '') {
+            update_mood_history(current_user_id(), $mood, date('Y-m-d', strtotime($timestamp)));
+        }
         
         // HANDLE TAGS
         if ($tagsInput !== '') {

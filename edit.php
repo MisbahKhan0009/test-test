@@ -44,31 +44,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   if ($title === '' || $content === '') {
     $error = 'Title and content are required';
   } else {
-    $upd = $pdo->prepare('UPDATE entries SET title = ?, content = ?, mood = ?, music_link = ?, category_id = ?, location = ?, privacy_level = ? WHERE entry_id = ? AND user_id = ?');
-    $upd->execute([$title, $content, $mood !== '' ? $mood : null, $musicLink !== '' ? $musicLink : null, $categoryId, $location !== '' ? $location : null, $privacyLevel, $entryId, current_user_id()]);
-
-    // Update tags
-    // First, delete existing tags
-    $delTags = $pdo->prepare('DELETE FROM entry_tags WHERE entry_id = ?');
-    $delTags->execute([$entryId]);
+    // Calculate word count manually (replaces trigger)
+    $wordCount = calculate_word_count($content);
     
-    // Then add new tags
+    $upd = $pdo->prepare('UPDATE entries SET title = ?, content = ?, mood = ?, music_link = ?, category_id = ?, location = ?, privacy_level = ?, word_count = ? WHERE entry_id = ? AND user_id = ?');
+    $upd->execute([$title, $content, $mood !== '' ? $mood : null, $musicLink !== '' ? $musicLink : null, $categoryId, $location !== '' ? $location : null, $privacyLevel, $wordCount, $entryId, current_user_id()]);
+
+    // Update tags using helper functions
+    remove_entry_tags($entryId);
+    
     if ($tagsInput !== '') {
       $tags = array_map('trim', explode(',', $tagsInput));
       foreach ($tags as $tagName) {
         if ($tagName === '') continue;
-        $stmt = $pdo->prepare('SELECT tag_id FROM tags WHERE tag_name = ?');
-        $stmt->execute([$tagName]);
-        $tag = $stmt->fetch();
-        if (!$tag) {
-          $ins = $pdo->prepare('INSERT INTO tags (tag_name) VALUES (?)');
-          $ins->execute([$tagName]);
-          $tagId = $pdo->lastInsertId();
-        } else {
-          $tagId = $tag['tag_id'];
-        }
-        $link = $pdo->prepare('INSERT INTO entry_tags (entry_id, tag_id) VALUES (?, ?)');
-        $link->execute([$entryId, $tagId]);
+        $tagId = get_or_create_tag($tagName);
+        add_tag_to_entry($entryId, $tagId);
       }
     }
 

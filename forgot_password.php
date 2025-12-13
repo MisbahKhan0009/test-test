@@ -2,6 +2,7 @@
 require_once(__DIR__ . '/config/db.php');
 session_start();
 
+$pdo = get_pdo();
 $message = '';
 $step = 'username'; // username, security_question, or success
 
@@ -28,13 +29,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $message = 'Session expired. Please start over.';
             $step = 'username';
         } else {
-            $answer = trim($_POST['security_answer']);
+            $answer = strtolower(trim($_POST['security_answer']));
             
             $stmt = $pdo->prepare("SELECT security_answer FROM users WHERE user_id = ?");
             $stmt->execute([$_SESSION['reset_user_id']]);
             $user = $stmt->fetch();
 
-            if ($user && password_verify(strtolower($answer), $user['security_answer'])) {
+            if ($user && $answer === $user['security_answer']) {
                 // Answer is correct, redirect to reset password page
                 header('Location: reset_password.php');
                 exit;

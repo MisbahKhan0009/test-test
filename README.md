@@ -40,14 +40,14 @@ A sophisticated diary application with advanced database features, glass morphis
 - Email: admin@diary.com
 - Role: Admin (Full system access, user management)
 
-**Premium Accounts:**
-- `john_doe` - Enhanced features, social sharing
-- `jane_smith` - Enhanced features, social sharing
-
 **Regular User Accounts:**
-- `alice_wonder` - Basic diary features
-- `bob_builder` - Basic diary features
-- `charlie_brown` - Basic diary features
+- `john_doe` - Standard diary features
+- `jane_smith` - Standard diary features
+- `alice_wonder` - Standard diary features
+- `bob_builder` - Standard diary features
+- `charlie_brown` - Standard diary features
+- `diana_prince` - Standard diary features
+- `emma_watson` - Standard diary features
 - `diana_prince` - Basic diary features
 - `emma_watson` - Basic diary features
 

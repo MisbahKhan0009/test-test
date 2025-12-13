@@ -161,56 +161,48 @@ function get_entry_tags(int $entryId): array {
 }
 
 /**
- * Add tag to entry
+ * Add tag to entry (and update count manually)
  */
 function add_tag_to_entry(int $entryId, int $tagId): void {
     require_once __DIR__ . '/db.php';
     db_exec("INSERT IGNORE INTO entry_tags (entry_id, tag_id) VALUES (?, ?)", [$entryId, $tagId]);
+    // Update tag usage count manually (since we don't have triggers)
+    db_exec("UPDATE tags SET usage_count = usage_count + 1 WHERE tag_id = ?", [$tagId]);
 }
 
 /**
- * Remove all tags from entry
+ * Remove all tags from entry (and update counts manually)
  */
 function remove_entry_tags(int $entryId): void {
     require_once __DIR__ . '/db.php';
+    // Decrease usage count for all tags of this entry
+    db_exec("UPDATE tags t 
+             JOIN entry_tags et ON t.tag_id = et.tag_id 
+             SET t.usage_count = GREATEST(t.usage_count - 1, 0) 
+             WHERE et.entry_id = ?", [$entryId]);
+    // Then delete the associations
     db_exec("DELETE FROM entry_tags WHERE entry_id = ?", [$entryId]);
 }
 
 /**
- * Get all roles
- */
-function get_roles(): array {
-    require_once __DIR__ . '/db.php';
-    return db_all("SELECT * FROM roles ORDER BY role_name");
-}
-
-/**
- * Get role by ID
- */
-function get_role(int $roleId): ?array {
-    require_once __DIR__ . '/db.php';
-    return db_one("SELECT * FROM roles WHERE role_id = ?", [$roleId]);
-}
-
-/**
- * Check if user has permission
+ * Check if user has permission (simplified - based on user_role)
+ * Only two roles: Admin and User
  */
 function user_has_permission(int $userId, string $permissionName): bool {
     require_once __DIR__ . '/db.php';
-    $result = db_one("SELECT fn_has_permission(?, ?) AS has_perm", [$userId, $permissionName]);
-    return $result && $result['has_perm'] == 1;
-}
-
-/**
- * Get user's permissions
- */
-function get_user_permissions(int $userId): array {
-    require_once __DIR__ . '/db.php';
-    return db_all("SELECT p.permission_name, p.description 
-                   FROM users u
-                   JOIN role_permissions rp ON u.role_id = rp.role_id
-                   JOIN permissions p ON rp.permission_id = p.permission_id
-                   WHERE u.user_id = ?", [$userId]);
+    $user = db_one("SELECT user_role FROM users WHERE user_id = ? AND is_active = TRUE", [$userId]);
+    
+    if (!$user) return false;
+    
+    $role = $user['user_role'];
+    
+    // Admin has all permissions
+    if ($role === 'Admin') return true;
+    
+    // Regular users have basic permissions
+    $basicPerms = ['create_entry', 'edit_entry', 'delete_entry', 'view_entry', 
+                  'share_entry', 'comment_entry', 'view_analytics', 'export_data'];
+    return in_array($permissionName, $basicPerms);
 }
 
 /**
@@ -286,11 +278,103 @@ function get_user_stats(int $userId): ?array {
 }
 
 /**
- * Update user stats (calls stored procedure)
+ * Update user stats using basic SQL queries
  */
 function update_user_stats(int $userId): void {
     require_once __DIR__ . '/db.php';
-    db_exec("CALL sp_update_user_stats(?)", [$userId]);
+    
+    // Calculate basic stats using aggregate functions
+    $stats = db_one("SELECT 
+        COUNT(*) AS total_entries,
+        SUM(word_count) AS total_words,
+        AVG(word_count) AS avg_words,
+        MAX(DATE(timestamp)) AS last_entry_date
+    FROM entries
+    WHERE user_id = ? AND is_deleted = FALSE", [$userId]);
+    
+    // Find most common mood
+    $mood = db_one("SELECT mood
+        FROM entries
+        WHERE user_id = ? AND is_deleted = FALSE AND mood IS NOT NULL
+        GROUP BY mood
+        ORDER BY COUNT(*) DESC
+        LIMIT 1", [$userId]);
+    
+    $most_common_mood = $mood ? $mood['mood'] : null;
+    
+    // Calculate current and longest streak (simplified)
+    $streak = calculate_writing_streak($userId);
+    
+    // Insert or update using INSERT...ON DUPLICATE KEY UPDATE
+    db_exec("INSERT INTO user_stats 
+        (user_id, total_entries, total_words, avg_words_per_entry, 
+         most_common_mood, last_entry_date, current_streak, longest_streak)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ON DUPLICATE KEY UPDATE
+            total_entries = VALUES(total_entries),
+            total_words = VALUES(total_words),
+            avg_words_per_entry = VALUES(avg_words_per_entry),
+            most_common_mood = VALUES(most_common_mood),
+            last_entry_date = VALUES(last_entry_date),
+            current_streak = VALUES(current_streak),
+            longest_streak = VALUES(longest_streak)",
+        [$userId, $stats['total_entries'], $stats['total_words'] ?? 0, 
+         $stats['avg_words'] ?? 0, $most_common_mood, $stats['last_entry_date'],
+         $streak['current'], $streak['longest']]);
+}
+
+/**
+ * Calculate writing streak using basic SQL
+ */
+function calculate_writing_streak(int $userId): array {
+    require_once __DIR__ . '/db.php';
+    
+    // Get all entry dates ordered descending
+    $dates = db_all("SELECT DISTINCT DATE(timestamp) AS entry_date
+        FROM entries
+        WHERE user_id = ? AND is_deleted = FALSE
+        ORDER BY entry_date DESC", [$userId]);
+    
+    $current_streak = 0;
+    $longest_streak = 0;
+    $temp_streak = 0;
+    $prev_date = null;
+    
+    foreach ($dates as $row) {
+        $date = strtotime($row['entry_date']);
+        
+        if ($prev_date === null) {
+            // First entry
+            $temp_streak = 1;
+            // Check if it's today or yesterday for current streak
+            $today = strtotime(date('Y-m-d'));
+            $yesterday = strtotime('-1 day', $today);
+            if ($date == $today || $date == $yesterday) {
+                $current_streak = 1;
+            }
+        } elseif (($prev_date - $date) == 86400) { // 1 day difference
+            // Consecutive day
+            $temp_streak++;
+            if ($current_streak > 0) {
+                $current_streak++;
+            }
+        } else {
+            // Streak broken
+            if ($temp_streak > $longest_streak) {
+                $longest_streak = $temp_streak;
+            }
+            $temp_streak = 1;
+        }
+        
+        $prev_date = $date;
+    }
+    
+    // Final check
+    if ($temp_streak > $longest_streak) {
+        $longest_streak = $temp_streak;
+    }
+    
+    return ['current' => $current_streak, 'longest' => $longest_streak];
 }
 
 /**
@@ -312,15 +396,51 @@ function format_privacy(string $privacyLevel): string {
 }
 
 /**
- * Log audit entry
+ * Log audit entry (simplified - removed for simpler schema)
  */
 function log_audit(int $userId, string $actionType, string $tableName, int $recordId, ?array $oldValues = null, ?array $newValues = null): void {
+    // Audit logging removed in simplified version
+    // All frontend features work without it
+    return;
+}
+
+/**
+ * Initialize entry stats (replaces trigger functionality)
+ */
+function init_entry_stats(int $entryId): void {
     require_once __DIR__ . '/db.php';
-    $oldJson = $oldValues ? json_encode($oldValues) : null;
-    $newJson = $newValues ? json_encode($newValues) : null;
-    $ipAddress = $_SERVER['REMOTE_ADDR'] ?? null;
-    
-    db_exec("INSERT INTO audit_log (user_id, action_type, table_name, record_id, old_values, new_values, ip_address)
-             VALUES (?, ?, ?, ?, ?, ?, ?)", 
-            [$userId, $actionType, $tableName, $recordId, $oldJson, $newJson, $ipAddress]);
+    db_exec("INSERT IGNORE INTO entry_stats (entry_id, view_count) VALUES (?, 0)", [$entryId]);
+}
+
+/**
+ * Update mood history (replaces trigger functionality)
+ */
+function update_mood_history(int $userId, string $mood, string $date): void {
+    require_once __DIR__ . '/db.php';
+    if ($mood !== '') {
+        db_exec("INSERT INTO mood_history (user_id, mood, entry_date, entry_count)
+                 VALUES (?, ?, ?, 1)
+                 ON DUPLICATE KEY UPDATE entry_count = entry_count + 1",
+                [$userId, $mood, $date]);
+    }
+}
+
+/**
+ * Update entry word count manually (replaces trigger functionality)
+ */
+function calculate_word_count(string $content): int {
+    $trimmed = trim($content);
+    if ($trimmed === '') return 0;
+    return count(explode(' ', preg_replace('/\s+/', ' ', $trimmed)));
+}
+
+/**
+ * Update entry stats counts manually
+ */
+function update_entry_stat_count(int $entryId, string $field): void {
+    require_once __DIR__ . '/db.php';
+    // Initialize if doesn't exist
+    db_exec("INSERT IGNORE INTO entry_stats (entry_id, view_count) VALUES (?, 0)", [$entryId]);
+    // Increment the specific field
+    db_exec("UPDATE entry_stats SET $field = $field + 1 WHERE entry_id = ?", [$entryId]);
 }
