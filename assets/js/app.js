@@ -46,8 +46,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // Position the dropdown aligned to the right edge of the button
         const rect = dropdownBtn.getBoundingClientRect();
         const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const menuWidth = dropdownMenu.offsetWidth || 192; // Get actual width or default to 192px (w-48)
         dropdownMenu.style.top = (rect.bottom + scrollTop + 4) + 'px';
-        dropdownMenu.style.left = (rect.right - 260) + 'px'; // Align right edge: button right - dropdown width (192px = w-48)
+        dropdownMenu.style.left = (rect.right - menuWidth) + 'px'; // Align right edge
         dropdownMenu.style.right = 'auto';
         dropdownMenu.classList.toggle('hidden');
       });

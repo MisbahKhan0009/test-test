@@ -3,6 +3,8 @@ require_once(__DIR__ . '/config/db.php');
 require_once(__DIR__ . '/lib/utils.php');
 session_start();
 
+$pdo = get_pdo();
+
 // Check if user completed security question verification
 if (!isset($_SESSION['reset_user_id'])) {
     flash('Please verify your identity first', 'warning');
@@ -24,11 +26,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Passwords do not match';
     } else {
         // Update password
-        $hash = password_hash($password, PASSWORD_DEFAULT);
-        $stmt = $pdo->prepare("UPDATE users SET password_hash = ? WHERE user_id = ?");
+        $stmt = $pdo->prepare("UPDATE users SET password = ? WHERE user_id = ?");
         
         try {
-            $stmt->execute([$hash, $_SESSION['reset_user_id']]);
+            $stmt->execute([$password, $_SESSION['reset_user_id']]);
             
             // Clear session variables
             unset($_SESSION['reset_user_id']);

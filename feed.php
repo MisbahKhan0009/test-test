@@ -88,9 +88,6 @@ include __DIR__ . '/partials/head.php';
         </h1>
         <p class="text-gray-600 dark:text-gray-400 mt-1">Discover stories from the community</p>
       </div>
-      <a href="<?php echo e(app_base_url()); ?>/create.php" class="px-6 py-3 rounded-full bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-medium shadow-lg hover:shadow-xl transition transform hover:scale-105">
-        <i class="fas fa-plus mr-2"></i>Share Your Story
-      </a>
     </div>
 
     <!-- Search & Filter Bar -->

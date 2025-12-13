@@ -8,12 +8,28 @@ require_login();
 $page_title = 'Analytics Dashboard';
 $user_id = current_user_id();
 
-// Get or update user stats
-$stats = get_user_stats($user_id);
-if (!$stats) {
-    update_user_stats($user_id);
-    $stats = get_user_stats($user_id);
-}
+// Calculate stats directly from entries table
+$stats = db_one("SELECT 
+    COUNT(*) AS total_entries,
+    COALESCE(SUM(word_count), 0) AS total_words,
+    COALESCE(AVG(word_count), 0) AS avg_words_per_entry,
+    MAX(DATE(timestamp)) AS last_entry_date
+FROM entries
+WHERE user_id = ? AND is_deleted = FALSE", [$user_id]);
+
+// Find most common mood
+$mood = db_one("SELECT mood
+    FROM entries
+    WHERE user_id = ? AND is_deleted = FALSE AND mood IS NOT NULL
+    GROUP BY mood
+    ORDER BY COUNT(*) DESC
+    LIMIT 1", [$user_id]);
+$stats['most_common_mood'] = $mood ? $mood['mood'] : null;
+
+// Calculate streaks
+$streak = calculate_writing_streak($user_id);
+$stats['current_streak'] = $streak['current'];
+$stats['longest_streak'] = $streak['longest'];
 
 // Get mood distribution for last 30 days using basic SQL
 $mood_data = db_all("SELECT mood, COUNT(*) AS entry_count,

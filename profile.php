@@ -77,11 +77,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $confirm = $_POST['confirm_password'] ?? '';
             if ($new === '' || strlen($new) < 6) throw new Exception('New password must be at least 6 characters');
             if ($new !== $confirm) throw new Exception('New password and confirmation do not match');
-            // Fetch hash and verify
-            $row = db_one('SELECT password_hash FROM users WHERE user_id = ?', [$uid]);
-            if (!$row || !password_verify($old, $row['password_hash'])) throw new Exception('Old password is incorrect');
-            $hash = password_hash($new, PASSWORD_DEFAULT);
-            db_exec('UPDATE users SET password_hash = ? WHERE user_id = ?', [$hash, $uid]);
+            // Fetch password and verify
+            $row = db_one('SELECT password FROM users WHERE user_id = ?', [$uid]);
+            if (!$row || $old !== $row['password']) throw new Exception('Old password is incorrect');
+            db_exec('UPDATE users SET password = ? WHERE user_id = ?', [$new, $uid]);
             flash('Password updated', 'success');
             redirect('profile.php');
         }
